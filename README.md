@@ -9,7 +9,7 @@ Status](https://img.shields.io/badge/CRAN-harf-blue)](https://cran.r-project.org
 
 <!-- badges: end -->
 
-### harf: High-Dimensional Adversarial Random Forests
+## harf: High-Dimensional Adversarial Random Forests
 
 Add text description here.
 

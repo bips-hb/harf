@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- badges: end -->
 
-### harf: High-Dimensional Adversarial Random Forests
+## harf: High-Dimensional Adversarial Random Forests
 
 Add text description here.
 
