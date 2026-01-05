@@ -5,7 +5,7 @@
 <!-- [![codecov](https://codecov.io/github/bips-hb/harf/graph/badge.svg?token=SZU7NGK8G8)](https://app.codecov.io/github/bips-hb/harf/) -->
 
 [![Lifecycle:
-Stable](https://img.shields.io/badge/lifecycle-Stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#Stable)
+Unstable](https://img.shields.io/badge/lifecycle-Unstable-red.svg)](https://lifecycle.r-lib.org/articles/stages.html#Stable)
 [![CRAN
 Status](https://img.shields.io/badge/CRAN-harf-blue)](https://cran.r-project.org/package=harf)
 
