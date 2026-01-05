@@ -11,3 +11,4 @@
 ^\.*.git
 vignettes/figure-gfm/
 ^..Rcheck
+^LICENSE.md

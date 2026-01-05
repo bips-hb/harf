@@ -14,8 +14,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
     arf,
+    data.table,
     stats,
-    digest
+    cluster,
+    fastPLS,
+    foreach,
+    gmodels,
+    rsvd
 Suggests: 
     testthat (>= 3.0.0),
     UpSetR (>= 1.4.0),
@@ -25,5 +30,8 @@ Suggests:
 Config/testthat/edition: 3
 Depends: R (>= 3.6.0)
 Collate: 
+  'utils.R'
+  'h_arf.R'
+  'h_forge.R'
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/bips-hb/harf/issues
