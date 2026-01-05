@@ -54,7 +54,7 @@ jobs:
 
       - name: Run tests
         run: |
-          Rscript -e ''
+          Rscript -e 'print("Complete me")'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
