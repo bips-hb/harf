@@ -19,7 +19,6 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0),
     UpSetR (>= 1.4.0),
-    rfae,
     knitr,
     rmarkdown,
     checkmate

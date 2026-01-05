@@ -54,7 +54,7 @@ jobs:
 
       - name: Run tests
         run: |
-          Rscript -e 'install.packages("covr");library(covr);cov <- package_coverage();covr::codecov(coverage = cov)'
+          Rscript -e 'install.packages("covr");library(covr);cov <- package_coverage();covr::codecov(coverage = cov);devtools::install_github("bips-hb/RFAE")'
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
