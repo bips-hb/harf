@@ -1,0 +1,46 @@
+---
+title: "harf"
+author: Cesaire J. K. Fouodo
+output: 
+  md_document:
+    variant: gfm
+    preserve_yaml: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/bips-hb/harf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bips-hb/harf/actions/workflows/R-CMD-check.yaml)
+<!-- [![codecov](https://codecov.io/github/bips-hb/harf/graph/badge.svg?token=SZU7NGK8G8)](https://app.codecov.io/github/bips-hb/harf/) -->
+[![Lifecycle: Stable](https://img.shields.io/badge/lifecycle-Stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#Stable)
+[![CRAN Status](https://img.shields.io/badge/CRAN-harf-blue)](https://cran.r-project.org/package=harf)
+
+
+<!-- badges: end -->
+
+### harf: High-Dimensional Adversarial Random Forests
+
+Add text description here.
+
+## Introduction
+
+Add introduction...
+
+## Installation
+
+devtools::install_github("bips-hp/harf")_
+
+## Examples
+
+```{r cars}
+# Examples are coming soon...
+```
+
+## References
+
+It's coming soon...
+
+
+

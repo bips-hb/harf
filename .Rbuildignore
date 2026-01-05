@@ -1,0 +1,13 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^.*test_code*
+^\.github$
+^README.Rmd
+^README.files
+^\.covrignore
+^doc$
+^\.*.DS_Store
+^\.*.Rhistory
+^\.*.git
+vignettes/figure-gfm/
+^..Rcheck

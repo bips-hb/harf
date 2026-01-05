@@ -1,0 +1,32 @@
+Package: harf
+Title: High-dimensional Adversarial Random Forests.
+Version: 0.0.1
+Authors@R: c(person(given = c("Cesaire", "J."),
+                      family = c("K.", "Fouodo"),
+                      role = c("aut", "cre"),
+                      email = "fouodo@leibniz-bips.de"))
+Description: High-dimensional Adversarial Random Forests (HARF) extend the 
+             classical Adversarial Random Forests (ARF) to high-dimensional settings.
+             ToDo: Complete-me...
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    arf,
+    stats,
+    digest
+Suggests: 
+    testthat (>= 3.0.0),
+    UpSetR (>= 1.4.0),
+    rfae,
+    knitr,
+    rmarkdown,
+    checkmate
+Config/testthat/edition: 3
+Depends: R (>= 3.6.0)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Collate: 
+VignetteBuilder: knitr, rmarkdown
+BugReports: https://github.com/bips-hb/harf/issues
