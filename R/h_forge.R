@@ -65,7 +65,6 @@ h_forge <- function (
   meta_model <- harf_obj$meta_model
   # Retrieve the omx_onset_pcs from harf_obj if omx_onset_data is provided
   if (!is.null(omx_onset_data)) {
-    # Stop if evidence does not have the same number of rows as omx_onset_data
     if (!is.null(evidence)) {
       if (nrow(evidence) != nrow(omx_onset_data)) {
         stop("Number of rows in evidence must match number of rows in omx_onset_data.")

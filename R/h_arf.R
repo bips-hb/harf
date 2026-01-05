@@ -68,23 +68,19 @@ h_arf <- function (
     stop("omx_data must be a data.frame.")
   }
   cln_omx_data <- colnames(omx_data)
-  # Stop if omx_onset_data is provided, but not a data.frame
   if (!is.null(omx_onset_data) & !is.data.frame(omx_onset_data)) {
     stop("omx_onset_data must be a data.frame.")
   }
-  # Stop if the nrow(omx_data) != nrow(omx_onset_data)
   if (!is.null(omx_onset_data)) {
     if (nrow(omx_data) != nrow(omx_onset_data)) {
       stop("Number of rows in omx_data must match number of rows in omx_onset_data.")
     }
   }
-  # Stop if the colnames of omx_onset_data are not in omx_data
   if (!is.null(omx_onset_data)) {
     if (!all(colnames(omx_onset_data) %in% colnames(omx_data))) {
       stop("All column names in omx_onset_data must be present in omx_data.")
     }
   }
-  # Stop if cli_lab_data is provided, but not a data.frame
   if (!is.null(cli_lab_data) & !is.data.frame(cli_lab_data)) {
     stop("cli_lab_data must be a data.frame.")
   }
@@ -93,23 +89,18 @@ h_arf <- function (
   } else {
     cln_cli_lab_data <- NULL
   }
-  # Stop if nrow(omx_data) != nrow(cli_lab_data)
   if (nrow(omx_data) != nrow(cli_lab_data)) {
     stop("Number of rows in omx_data must match number of rows in cli_lab_data.")
   }
-  # Stop if encoder is not "fastcor" or "RFAE"
   if (!encoder %in% c("fastcor", "RFAE")) {
     stop("encoder must be one of 'fastcor' or 'RFAE'.")
   }
-  # Stop if correlation_method is not one of "pearson", "spearman", "kendall"
   if (!correlation_method %in% c("pearson", "spearman", "kendall")) {
     stop("correlation_method must be one of 'pearson', 'spearman', or 'kendall'.")
   }
-  # Stop if chunck_size is not a positive integer
   if (!is.numeric(chunck_size) | chunck_size <= 0 | chunck_size != round(chunck_size)) {
     stop("chunck_size must be a positive integer.")
   }
-  # Transpose the omx_data and compute correlation matrix.
   message("Clustering features...\n")
   # Encoding via fast correlation and PCA
   if (encoder == "fastcor") {
@@ -121,7 +112,6 @@ h_arf <- function (
     }
 
     # PCA and elbow point detection to determine optimal number of clusters
-    # pca_res <- prcomp(cor_matrix, center = TRUE, scale. = TRUE)
     pca_res <- fast.prcomp(cor_matrix, retx = TRUE, center = TRUE, scale. = TRUE)
     variances <- pca_res$sdev^2
     k_pcs <- find_elbow(variances)
@@ -175,7 +165,6 @@ h_arf <- function (
   meta_features <- sapply(
     unique(feature_clusters),
     function(cluster) {
-      # rowSums(omx_data[ , which(feature_clusters == cluster), drop = FALSE], na.rm = TRUE)
       cluster_data <- omx_data[ , which(feature_clusters == cluster), drop = FALSE]
       if (ncol(cluster_data) < 2) {
         return(as.matrix(cluster_data))
@@ -212,8 +201,6 @@ h_arf <- function (
     }
   )
   meta_features <- as.data.frame(meta_features)
-  # colnames(meta_features) <- sprintf("cluster_%s",
-  #                                         unique(feature_clusters))
   colnames(meta_features) <- sprintf("cluster_%s",
                                           ncol(meta_features))
   # Dimension reduction of meta features if num_btwn_pcs < ncol(meta_features)
@@ -288,7 +275,6 @@ h_arf <- function (
     }
     ftr_in_cluster <- which(feature_clusters == cluster)
     ftr_data_subset <- omx_data[, ftr_in_cluster, drop = FALSE]
-    # Add meta cluster information to ftr_data_subset
     other_clusters <- unique(feature_clusters[feature_clusters != cluster])
     ftr_data_subset <- data.frame(ftr_data_subset,
                                   meta_features)
