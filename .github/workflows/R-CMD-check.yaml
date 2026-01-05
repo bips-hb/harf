@@ -54,7 +54,7 @@ jobs:
 
       - name: Run tests
         run: |
-          Rscript -e 'devtools::install_github("bips-hb/RFAE")'
+          Rscript -e ''
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
