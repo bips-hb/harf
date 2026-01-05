@@ -30,8 +30,10 @@ Suggests:
 Config/testthat/edition: 3
 Depends: R (>= 3.6.0)
 Collate: 
+  'single_cell.R'
   'utils.R'
   'h_arf.R'
   'h_forge.R'
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/bips-hb/harf/issues
+LazyData: true
