@@ -1,5 +1,5 @@
 Package: harf
-Title: High-dimensional Adversarial Random Forests.
+Title: High-dimensional Adversarial Random Forests
 Version: 0.0.1
 Authors@R: c(person(given = c("Cesaire", "J."),
                       family = c("K.", "Fouodo"),
@@ -25,8 +25,6 @@ Suggests:
     checkmate
 Config/testthat/edition: 3
 Depends: R (>= 3.6.0)
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Collate: 
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/bips-hb/harf/issues
