@@ -30,7 +30,11 @@ Add introduction...
 
 ## Installation
 
-devtools::install_github("bips-hp/harf")_
+
+```{r install, include = TRUE, eval = FALSE}
+devtools::install_github("bips-hp/harf")
+```
+
 
 ## Examples
 
