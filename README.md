@@ -92,6 +92,6 @@ set.seed(142)
   Artificial Intelligence and Statistics. Link
   [here](https://proceedings.mlr.press/v206/watson23a.html).
 
-- Fouodo, C. J. K., et al. (2025). High-dimensional adversarial random
+- Fouodo, C. J. K., et al. (2026). High-dimensional adversarial random
   forests. Submission. Link [don’t
   click](https://arxiv.org/abs/2405.12345).
