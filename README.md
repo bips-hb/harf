@@ -91,3 +91,7 @@ set.seed(142)
   modeling. In Proceedings of the 26th International Conference on
   Artificial Intelligence and Statistics. Link
   [here](https://proceedings.mlr.press/v206/watson23a.html).
+
+- Fouodo, C. J. K., et al. (2025). High-dimensional adversarial random
+  forests. Submission. Link [don’t
+  click](https://arxiv.org/abs/2405.12345).
