@@ -1,6 +1,7 @@
-#' Forests for generative modeling for high-dimensional omics data.
+#' Forest generator for high-dimensional data.
 #'
-#' Uses a pre-trained harf model to generate synthetic omics data.
+#' The algorithm uses the high-dimensional arf model to generate synthetic
+#' data
 #'
 #' @param harf_obj A pre-trained harf model.
 #' @param n_synth Number of synthetic samples to generate.
@@ -24,9 +25,37 @@
 #'
 #' @returns A data.table containing the generated synthetic omics data.
 #' @importFrom foreach %do% %dopar% foreach
+#' @seealso \code{\link[arf]{forge}} for details on the forging process.
 #' @export
-#'
-# TODO: Add examples
+#' @author Césaire Fouodo
+#' @examples
+#' \dontrun{
+#' data(single_cell)
+#' harf_model <- h_arf(
+#'   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
+#'   cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+#'   parallel = TRUE,
+#'   verbose = FALSE
+#' )
+#' # Unconditional sampling from harf_model
+#' set.seed(123)
+#' synth_single_cell <- h_forge(
+#'  harf_obj = harf_model,
+#'  n_synth = nrow(single_cell),
+#'  evidence = NULL,
+#'  parallel = TRUE,
+#'  verbose = FALSE
+#'  )
+#'  # Conditional resampling from harf_model
+#'  set.seed(142)
+#'  lung_single_cell <- h_forge(
+#'      harf_obj = harf_model,
+#'      n_synth = sum(single_cell$cell_type == "lung"),
+#'      evidence = data.frame(cell_type = "lung"),
+#'      verbose = FALSE,
+#'      parallel = TRUE
+#'     )
+#' }
 h_forge <- function (
     harf_obj,
     n_synth,
@@ -43,7 +72,7 @@ h_forge <- function (
   i <- NULL  # To avoid R CMD check note for foreach
   # Test that harf_obj is of class harf
   if (!inherits(harf_obj, "harf")) {
-    stop("harf_obj must be an object of class 'isoARF'.")
+    stop("harf_obj must be an object of class 'harf'.")
   }
   # n_synth must be an integer greater than 0
   if (!is.numeric(n_synth) | n_synth <= 0 | n_synth != round(n_synth)) {
@@ -61,7 +90,7 @@ h_forge <- function (
   } else {
     meta_evidence <- NULL
   }
-  # Retrieve meta_model from isoARF
+  # Retrieve meta_model from harf_obj
   meta_model <- harf_obj$meta_model
   # Retrieve the omx_onset_pcs from harf_obj if omx_onset_data is provided
   if (!is.null(omx_onset_data)) {
@@ -134,7 +163,7 @@ h_forge <- function (
   synth_omx_data <- do.call(cbind, synth_omx_data_list)
   if (!is.null(harf_obj$cli_lab_feature)) {
     synth_data <- data.table::data.table(synth_omx_data,
-                             meta_data[ , h_arf$cli_lab_feature,
+                             meta_data[ , harf_obj$cli_lab_feature,
                                         drop = FALSE])
   } else {
     synth_data <- data.table::data.table(synth_omx_data)

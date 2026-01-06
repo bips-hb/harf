@@ -2,7 +2,7 @@
 % Please edit documentation in R/h_forge.R
 \name{h_forge}
 \alias{h_forge}
-\title{Forests for generative modeling for high-dimensional omics data.}
+\title{Forest generator for high-dimensional data.}
 \usage{
 h_forge(
   harf_obj,
@@ -53,5 +53,41 @@ See \code{forde} for details.}
 A data.table containing the generated synthetic omics data.
 }
 \description{
-Uses a pre-trained harf model to generate synthetic omics data.
+The algorithm uses the high-dimensional arf model to generate synthetic
+data
+}
+\examples{
+\dontrun{
+data(single_cell)
+harf_model <- h_arf(
+  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
+  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+  parallel = TRUE,
+  verbose = FALSE
+)
+# Unconditional sampling from harf_model
+set.seed(123)
+synth_single_cell <- h_forge(
+ harf_obj = harf_model,
+ n_synth = nrow(single_cell),
+ evidence = NULL,
+ parallel = TRUE,
+ verbose = FALSE
+ )
+ # Conditional resampling from harf_model
+ set.seed(142)
+ lung_single_cell <- h_forge(
+     harf_obj = harf_model,
+     n_synth = sum(single_cell$cell_type == "lung"),
+     evidence = data.frame(cell_type = "lung"),
+     verbose = FALSE,
+     parallel = TRUE
+    )
+}
+}
+\seealso{
+\code{\link[arf]{forge}} for details on the forging process.
+}
+\author{
+Césaire Fouodo
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/h_arf.R
 \name{h_arf}
 \alias{h_arf}
-\title{Isolated Adversarial Random Forest for Omics Data}
+\title{High-dimensional Adversarial Random Forest}
 \usage{
 h_arf(
   omx_data,
@@ -80,5 +80,39 @@ An isoARF object containing the fitted adversarial models, and clustering
 information.
 }
 \description{
-Isolated Adversarial Random Forest for Omics Data
+The algorithm partitions high-dimensional data into isolated regions and fits
+Adversarial Random Forest (ARF) models within each region to capture local
+dependencies.
+}
+\examples{
+\dontrun{
+data(single_cell)
+harf_model <- h_arf(
+  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
+  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+  parallel = TRUE,
+  verbose = FALSE
+)
+# Unconditional sampling from harf_model
+set.seed(123)
+synth_single_cell <- h_forge(
+ harf_obj = harf_model,
+ n_synth = nrow(single_cell),
+ evidence = NULL,
+ parallel = TRUE,
+ verbose = FALSE
+ )
+ # Conditional resampling from harf_model
+ set.seed(142)
+ lung_single_cell <- h_forge(
+     harf_obj = harf_model,
+     n_synth = sum(single_cell$cell_type == "lung"),
+     evidence = data.frame(cell_type = "lung"),
+     verbose = FALSE,
+     parallel = TRUE
+    )
+}
+}
+\seealso{
+\link{h_forge}, \link[arf:adversarial_rf]{arf::adversarial_rf}, \link[arf:forde]{arf::forde}
 }

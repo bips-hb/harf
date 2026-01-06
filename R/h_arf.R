@@ -1,4 +1,8 @@
-#' Isolated Adversarial Random Forest for Omics Data
+#' High-dimensional Adversarial Random Forest
+#'
+#' The algorithm partitions high-dimensional data into isolated regions and fits
+#' Adversarial Random Forest (ARF) models within each region to capture local
+#' dependencies.
 #'
 #' @param omx_data A data.frame containing omics data where rows
 #' represent samples (e.g. patients or cells) and columns represent features
@@ -41,7 +45,35 @@
 #' @importFrom gmodels fast.prcomp
 #' @importFrom stats cor dist prcomp
 #' @export
-# TODO: Add examples
+#' @seealso [h_forge], [arf::adversarial_rf], [arf::forde]
+#' @examples
+#' \dontrun{
+#' data(single_cell)
+#' harf_model <- h_arf(
+#'   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
+#'   cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+#'   parallel = TRUE,
+#'   verbose = FALSE
+#' )
+#' # Unconditional sampling from harf_model
+#' set.seed(123)
+#' synth_single_cell <- h_forge(
+#'  harf_obj = harf_model,
+#'  n_synth = nrow(single_cell),
+#'  evidence = NULL,
+#'  parallel = TRUE,
+#'  verbose = FALSE
+#'  )
+#'  # Conditional resampling from harf_model
+#'  set.seed(142)
+#'  lung_single_cell <- h_forge(
+#'      harf_obj = harf_model,
+#'      n_synth = sum(single_cell$cell_type == "lung"),
+#'      evidence = data.frame(cell_type = "lung"),
+#'      verbose = FALSE,
+#'      parallel = TRUE
+#'     )
+#' }
 
 h_arf <- function (
     omx_data,
@@ -101,7 +133,9 @@ h_arf <- function (
   if (!is.numeric(chunck_size) | chunck_size <= 0 | chunck_size != round(chunck_size)) {
     stop("chunck_size must be a positive integer.")
   }
-  message("Clustering features...\n")
+  if (isTRUE(verbose)) {
+    message("Clustering features...\n")
+  }
   # Encoding via fast correlation and PCA
   if (encoder == "fastcor") {
     if (correlation_method == "spearman") {
@@ -202,7 +236,7 @@ h_arf <- function (
   )
   meta_features <- as.data.frame(meta_features)
   colnames(meta_features) <- sprintf("cluster_%s",
-                                          ncol(meta_features))
+                                     ncol(meta_features))
   # Dimension reduction of meta features if num_btwn_pcs < ncol(meta_features)
   if (num_btwn_pcs < ncol(meta_features)) {
     pca_meta <- rpca(as.matrix(t(meta_features)),
@@ -214,7 +248,7 @@ h_arf <- function (
       crossprod(t(as.matrix(meta_features)), as.matrix(pca_meta$x))
     )
     colnames(meta_features) <- sprintf("meta_pc_%s",
-                                            1:num_btwn_pcs)
+                                       1:num_btwn_pcs)
   }
   # Dimension reduction of omx_onset_data if provided
   onset_loadings <- NULL
@@ -235,7 +269,7 @@ h_arf <- function (
                                         1:ncol(onset_features))
     # Add onset features to meta features
     meta_features <- data.frame(meta_features,
-                                     onset_features)
+                                onset_features)
   }
   # Add clinical/laboratory data if provided
   if (!is.null(cli_lab_data)) {
@@ -312,14 +346,14 @@ h_arf <- function (
   }
   # Export feature_cluster_df and meta to arf_models as well.
   hd_arf <- list(meta_model = meta_model,
-                  models = arf_models,
-                  cluster = data.frame(
-                    feature = colnames(omx_data),
-                    cluster = feature_clusters
-                  ),
-                  meta_features = meta_features,
-                  omx_features = cln_omx_data,
-                  cli_lab_features = cln_cli_lab_data
+                 models = arf_models,
+                 cluster = data.frame(
+                   feature = colnames(omx_data),
+                   cluster = feature_clusters
+                 ),
+                 meta_features = meta_features,
+                 omx_features = cln_omx_data,
+                 cli_lab_features = cln_cli_lab_data
   )
   class(hd_arf) <- "harf"
   return(hd_arf)
