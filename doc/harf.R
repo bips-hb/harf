@@ -1,0 +1,138 @@
+## ----include = FALSE----------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+## ----install_libraries, warning = FALSE, message = FALSE, eval = FALSE--------
+# install.packages("data.table")
+# install.packages("rsvd")
+# install.packages("Rtsne")
+# install.packages("cowplot")
+# if (!require("BiocManager", quietly = TRUE))
+#   install.packages("BiocManager")
+# BiocManager::install("SingleCellExperiment")
+# BiocManager::install("scater")
+# install.packages("ggplot2")
+# install.packages("corrplot")
+
+## ----load_libraries, warning = FALSE, message = FALSE-------------------------
+library(harf)
+library(data.table) # install.packages("data.table")
+library(rsvd) # install.packages("rsvd")
+library(Rtsne) # install.packages("Rtsne")
+library(cowplot) # install.packages("cowplot")
+library(SingleCellExperiment) # if (!require("BiocManager", quietly = TRUE)); install.packages("BiocManager"); BiocManager::install("SingleCellExperiment")
+library(ggplot2) # install.packages("ggplot2")
+library(corrplot) # install.packages("corrplot")
+library(scater) # if (!require("BiocManager", quietly = TRUE)); install.packages("BiocManager"); BiocManager::install("scater")
+
+## ----data_example, include=TRUE, eval=TRUE, message=FALSE---------------------
+data("single_cell")
+# Do not parellelize on CRAN
+parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
+
+## ----harf_training, include = TRUE, eval = TRUE, message=FALSE----------------
+set.seed(123)
+harf_model <- h_arf(
+ omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
+ cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+ num_trees = 8,
+ parallel = parallel,
+ verbose = FALSE
+)
+
+## ----harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
+set.seed(123)
+synth_single_cell <- h_forge(
+  harf_obj = harf_model,
+  n_synth = nrow(single_cell),
+  evidence = NULL,
+  parallel = parallel,
+  verbose = FALSE
+  )
+
+## ----harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE----
+set.seed(123)
+single_cell_list <- lapply(unique(single_cell$cell_type), function (ct) {
+  ct_synth <- h_forge(
+        harf_obj = harf_model,
+        n_synth = sum(single_cell$cell_type == ct),
+        evidence = data.frame(cell_type = ct),
+        verbose = FALSE,
+        parallel = parallel
+      )
+  return(ct_synth)
+})
+cond_synth_single_cell <- do.call(rbind, single_cell_list)
+
+## ----harf_correlation_matrices, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7, fig.height = 6.5----
+# Re-arrange data by grouping gene by clusters
+cluster_feature <- copy(harf_model$cluster)
+setorder(cluster_feature, cluster)
+orig_clustered <- single_cell[ , c("cell_type", cluster_feature$feature)]
+synth_clustered <- as.data.frame(synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
+cond_synth_clustered <- as.data.frame(cond_synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
+plot_corr <- function(dt, title) {
+  corr_matrix <- cor(dt[ , 2:51], method = "spearman")
+  corrplot(corr_matrix,
+           method = "circle",
+           tl.col = "black",
+           tl.pos = "n",
+           # tl.srt = 45,
+           title = title,
+           mar = c(0, 0, 1, 0))
+}
+par(mfrow = c(2,2))
+plot_corr(orig_clustered, "Original")
+plot_corr(synth_clustered, "Synthetic")
+plot_corr(cond_synth_clustered, "Conditional resampling")
+par(mfrow = c(1, 1))
+
+## ----harf_tsne, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7.1, fig.height = 3.5----
+set.seed(123)
+tsne_it <- function (sc_data, perp = 30, title = "") {
+  # Create SingleCellExperiment object
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(counts = t(as.matrix(sc_data[ , - which(colnames(sc_data)  == "cell_type")])))
+  )
+  SingleCellExperiment::logcounts(sce) <- SingleCellExperiment::counts(sce) # Log-normalization
+  sce$cell_type <- sc_data$cell_type
+  pc_sce <- rpca(t(SingleCellExperiment::counts(sce)))
+  # tSNE with rotated pcs
+  ts_sce <- Rtsne::Rtsne(
+    pc_sce$x %*% pc_sce$rotation,
+    perplexity = perp,
+    verb = FALSE,
+    pca = FALSE,
+    check_duplicates = FALSE
+  )
+  SingleCellExperiment::reducedDim(sce, "tsne") = ts_sce$Y
+  sce_plot <- scater::plotReducedDim(sce, "tsne", colour_by = "cell_type") + 
+  ggplot2::ggtitle(title) +
+  ggplot2::theme(legend.position = "bottom")
+  return(sce_plot)
+}  
+orig_plot <- tsne_it(single_cell,
+                     perp = 30,
+                     title = "Original")
+synth_plot <- tsne_it(as.data.frame(synth_single_cell),
+                      perp = 30,
+                      title = "Synthetic")
+cond_synth_plot <- tsne_it(as.data.frame(cond_synth_single_cell),
+                           perp = 30,
+                           title = "Conditional resampling")
+legend <- cowplot::get_legend(
+  orig_plot + theme(legend.position = "bottom")
+)
+orig_plot <- orig_plot + theme(legend.position = "none")
+synth_plot <- synth_plot + theme(legend.position = "none")
+cond_synth_plot <- cond_synth_plot + theme(legend.position = "none")
+all_plots <- cowplot::plot_grid(orig_plot, synth_plot, cond_synth_plot, ncol = 3)
+plot_grid(
+  all_plots,
+  legend,
+  ncol = 1,
+  rel_heights = c(1, 0.2)
+)
+
