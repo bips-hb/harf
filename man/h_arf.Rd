@@ -19,8 +19,8 @@ h_arf(
   oob = FALSE,
   family = "truncnorm",
   finite_bounds = "no",
-  alpha = 0.05,
-  epsilon = 0.05,
+  alpha = 0,
+  epsilon = 0,
   parallel = TRUE,
   verbose = FALSE
 )

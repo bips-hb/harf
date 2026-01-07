@@ -25,7 +25,13 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    checkmate
+    checkmate,
+    Rtsne,
+    SingleCellExperiment,
+    corrplot,
+    scater,
+    cowplot,
+    ggplot2
 Config/testthat/edition: 3
 Depends: R (>= 3.6.0)
 Collate: 

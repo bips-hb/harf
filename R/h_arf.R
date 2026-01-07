@@ -90,8 +90,8 @@ h_arf <- function (
     oob = FALSE,
     family = "truncnorm",
     finite_bounds = "no",
-    alpha = 0.05,
-    epsilon = 0.05,
+    alpha = 0,
+    epsilon = 0.0,
     parallel = TRUE,
     verbose = FALSE
 ) {
@@ -196,9 +196,12 @@ h_arf <- function (
     }
   }
   # Compute meta cluster features for the joint structure between cluster.
-  meta_features <- sapply(
+  meta_features <- lapply(
     unique(feature_clusters),
     function(cluster) {
+      # return(
+      #   rowSums(omx_data[ , which(feature_clusters == cluster), drop = FALSE], na.rm = TRUE)
+      # )
       cluster_data <- omx_data[ , which(feature_clusters == cluster), drop = FALSE]
       if (ncol(cluster_data) < 2) {
         return(as.matrix(cluster_data))
