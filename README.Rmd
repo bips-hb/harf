@@ -37,44 +37,13 @@ devtools::install_github("bips-hp/harf")
 ```
 
 
-## Training a HARF model
+## Example
 
-Using the built-in `single_cell` dataset, we illustrate how to train a HARF model.
+We refer to the package vignette for a comprehensive example of how to use the `harf` package.
 
-```{r harf_training, include = TRUE, eval = FALSE}
-data(single_cell)
-harf_model <- h_arf(
- omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
- cli_lab_data = data.frame(cell_type = single_cell$cell_type),
- parallel = TRUE,
- verbose = FALSE
-)
-```
-
-## Generating synthetic data
-
-```{r harf_synthetic_data, include = TRUE, eval = FALSE}
-set.seed(123)
-synth_single_cell <- h_forge(
-  harf_obj = harf_model,
-  n_synth = nrow(single_cell),
-  evidence = NULL,
-  parallel = TRUE,
-  verbose = FALSE
-  )
-```
-
-## Conditional expectations
-
-```{r harf_conditional_expectation, include = TRUE, eval = FALSE}
-set.seed(142)
-  lung_single_cell <- h_forge(
-      harf_obj = harf_model,
-      n_synth = sum(single_cell$cell_type == "lung"),
-      evidence = data.frame(cell_type = "lung"),
-      verbose = FALSE,
-      parallel = TRUE
-     )
+```{r example, include = TRUE, eval = TRUE}
+library(harf)
+vignette("harf")
 ```
 
 ## References
