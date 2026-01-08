@@ -232,7 +232,7 @@ plot_grid(
 
 We introduced the R package **harf**, which enables the generation of high-dimensional synthetic data. The package extends the adversarial random forest framework to effectively handle high-dimensional omics data and supports both unconditional and conditional data generation. Using visual comparisons based on correlation matrices and `t-SNE` projections, we showed that the synthetic data produced by **harf** closely resemble the original data in terms of feature correlations and underlying cluster structure.
 
-While **harf** enables the simultaneous generation of both omics and clinical data, it requires that features be clustered prior to training the HARF model. This step may be challenging in situations where features do not naturally form clusters or when the optimal number of clusters or feature groups is not easily determined. Future work could explore adaptive clustering strategies or methods that relax this requirement to further improve usability in diverse high-dimensional settings.
+While **harf** enables the simultaneous generation of both omics and clinical data, it requires that features be clustered prior to training the HARF model. This step may be challenging in situations where features do not naturally form clusters or when the optimal number of clusters or feature groups is not easily determined. Future work could explore adaptive clustering strategies or methods that relax this requirement to further improve usability in diverse high-dimensional settings. 
 
 ## References
 
