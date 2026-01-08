@@ -49,5 +49,6 @@ po/*~
 rsconnect/
 .Rproj.user
 /doc/
+/docs/
 /Meta/
 /bin/
