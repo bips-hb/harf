@@ -1,3 +1,12 @@
+---
+title: "harf"
+author: Cesaire J. K. Fouodo
+output: 
+  md_document:
+    variant: gfm
+    preserve_yaml: true
+---
+
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/bips-hb/harf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bips-hb/harf/actions/workflows/R-CMD-check.yaml)
@@ -43,55 +52,26 @@ terminal nodes.
 devtools::install_github("bips-hp/harf")
 ```
 
-## Training a HARF model
+## Example
 
-Using the built-in `single_cell` dataset, we illustrate how to train a
-HARF model.
-
-``` r
-data(single_cell)
-harf_model <- h_arf(
- omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
- cli_lab_data = data.frame(cell_type = single_cell$cell_type),
- parallel = TRUE,
- verbose = FALSE
-)
-```
-
-## Generating synthetic data
+We refer to the package vignette for a comprehensive example of how to
+use the `harf` package.
 
 ``` r
-set.seed(123)
-synth_single_cell <- h_forge(
-  harf_obj = harf_model,
-  n_synth = nrow(single_cell),
-  evidence = NULL,
-  parallel = TRUE,
-  verbose = FALSE
-  )
+library(harf)
+vignette("harf")
 ```
 
-## Conditional expectations
-
-``` r
-set.seed(142)
-  lung_single_cell <- h_forge(
-      harf_obj = harf_model,
-      n_synth = sum(single_cell$cell_type == "lung"),
-      evidence = data.frame(cell_type = "lung"),
-      verbose = FALSE,
-      parallel = TRUE
-     )
-```
+    ## Warning: vignette 'harf' not found
 
 ## References
+
+- Fouodo, C. J. K., et al. (2026). High-dimensional adversarial random
+  forests. Submission. Link [don’t
+  click](https://arxiv.org/abs/2405.12345).
 
 - Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023).
   Adversarial random forests for density estimation and generative
   modeling. In Proceedings of the 26th International Conference on
   Artificial Intelligence and Statistics. Link
   [here](https://proceedings.mlr.press/v206/watson23a.html).
-
-- Fouodo, C. J. K., et al. (2026). High-dimensional adversarial random
-  forests. Submission. Link [don’t
-  click](https://arxiv.org/abs/2405.12345).
