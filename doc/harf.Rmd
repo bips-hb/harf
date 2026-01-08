@@ -42,7 +42,13 @@ allows for conditional data generation as well.
 
 ## Libraries and data
 
-Install the required packages if you have not already done so.
+The data used in this vignette are included in the *harf* package and originate from The Cancer Genome Atlas (TCGA) and the Genotype-Tissue Expression (GTEx) projects, two large-scale public resources providing extensive RNA-seq data. The data were extracted from previously processed and curated datasets generated using the pipeline described in Aguet et al. (2017).
+
+The built-in dataset `single_cell`, distributed with *harf*, contains $233$ log-transformed gene expression measurements from $654$ cells collected across $15$ human tissues, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
+
+In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The HARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be either categorical or numeric. In this vignette, gene expression measurements are used as the omics data, while cell type serves as the clinical or phenotypic variable.
+
+We start by installing the required packages if you have not already done so.
 
 ```{r install_libraries, warning = FALSE, message = FALSE, eval = FALSE}
 install.packages("data.table")
@@ -57,21 +63,22 @@ install.packages("ggplot2")
 install.packages("corrplot")
 ```
 
-Load the libraries.
+We load the libraries.
 
 ```{r load_libraries, warning = FALSE, message = FALSE}
 library(harf)
-library(data.table) # install.packages("data.table")
-library(rsvd) # install.packages("rsvd")
-library(Rtsne) # install.packages("Rtsne")
-library(cowplot) # install.packages("cowplot")
-library(SingleCellExperiment) # if (!require("BiocManager", quietly = TRUE)); install.packages("BiocManager"); BiocManager::install("SingleCellExperiment")
-library(ggplot2) # install.packages("ggplot2")
-library(corrplot) # install.packages("corrplot")
-library(scater) # if (!require("BiocManager", quietly = TRUE)); install.packages("BiocManager"); BiocManager::install("scater")
+library(data.table)
+library(rsvd)
+library(Rtsne)
+library(cowplot)
+library(SingleCellExperiment)
+library(ggplot2)
+library(corrplot)
+library(scater)
 ```
 
-We use the built-in dataset `single_cell` to illustrate the usage of **harf**. This dataset contains $233$ log-transformed gene expression measurements of $654$ cells collected from $15$ human tissues, including bladder, breast, cervix, colon, esophagus (gas, mucosa, muscularis), kidney, liver, lung, prostate, salivary, stomach, thyroid, and uterus. The cell type feature (`cell_type`) of the dataset refers to the tissue from which each cell was collected.
+We load the single_cell dataset and disable parallelization when the code is 
+executed in a `CRAN` environment, in accordance with `CRAN` policies.
 
 ```{r data_example, include=TRUE, eval=TRUE, message=FALSE}
 data("single_cell")
@@ -81,14 +88,16 @@ parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
 
 ## Training a harf model #
 
-TODO: text me
+We train a HARF model using the `h_arf` function. The gene expression measurements 
+are provided as the `omx_data` argument, while the cell type information is passed as 
+the `cli_lab_data` argument. we use the default number of trees and other 
+default random forest hyperparameters as specified in the `R` package `ranger`.
 
 ```{r harf_training, include = TRUE, eval = TRUE, message=FALSE}
 set.seed(123)
 harf_model <- h_arf(
  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
- num_trees = 8,
  parallel = parallel,
  verbose = FALSE
 )
@@ -96,7 +105,9 @@ harf_model <- h_arf(
 
 ## Generating synthetic data
 
-TODO: text me
+The `h_forge` function generates synthetic data from a trained HARF model. Here, 
+we generate the same number of synthetic samples as in the original dataset, and 
+without any evidence (i.e., unconditional generation).
 
 ```{r harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
 set.seed(123)
@@ -111,7 +122,10 @@ synth_single_cell <- h_forge(
 
 ## Conditional expectations
 
-TODO: text me
+For conditional data generation, we generate synthetic samples for each cell type 
+separately. The generated samples are then combined to form the final synthetic
+dataset. Note that our current actual `harf` object allows for conditioning on clinical 
+feature only. 
 
 ```{r harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE}
 set.seed(123)
@@ -130,7 +144,11 @@ cond_synth_single_cell <- do.call(rbind, single_cell_list)
 
 ## Comparaison of correlation matrices
 
-TODO: text me
+We visually compare the correlation matrices of the original data, the synthetic data, 
+and the conditionally resampled data. To enhance interpretability, we rearrange the features 
+according to their cluster assignments obtained from the HARF model. The correlation 
+plots exhibit similar patterns across the three datasets, indicating that the HARF model 
+effectively preserve the origin feature correlation structure.
 
 ```{r harf_correlation_matrices, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7, fig.height = 6.5}
 # Re-arrange data by grouping gene by clusters
@@ -158,7 +176,9 @@ par(mfrow = c(1, 1))
 
 ## Show original and synthetic data in 2D using t-SNE
 
-TODO: text me
+We use t-SNE to visualize the original data, the synthetic data, and the 
+conditionally resampled data in a two-dimensional space. We observe that the 
+three datasets exhibit similar cluster structure of tissues.
 
 ```{r harf_tsne, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7.1, fig.height = 3.5}
 set.seed(123)
@@ -210,9 +230,19 @@ plot_grid(
 
 ## Conclusion
 
-TODO: text me
+We introduced the R package **harf**, which enables the generation of high-dimensional synthetic data. The package extends the adversarial random forest framework to effectively handle high-dimensional omics data and supports both unconditional and conditional data generation. Using visual comparisons based on correlation matrices and `t-SNE` projections, we showed that the synthetic data produced by **harf** closely resemble the original data in terms of feature correlations and underlying cluster structure.
+
+While **harf** enables the simultaneous generation of both omics and clinical data, it requires that features be clustered prior to training the HARF model. This step may be challenging in situations where features do not naturally form clusters or when the optimal number of clusters or feature groups is not easily determined. Future work could explore adaptive clustering strategies or methods that relax this requirement to further improve usability in diverse high-dimensional settings.
 
 ## References
+
+- The Cancer Genome Atlas Pan-Cancer analysis project. Nature Genetics, 45, 1113–1120 (2013). Link [here](https://www.nature.com/articles/ng.2764).
+
+- The Genotype-Tissue Expression (GTEx) project. Nature Genetics, 47, 1231–1237. (2015). Link [here](https://www.nature.com/articles/ng.2653).
+
+- Genetic effects on gene expression across human tissues. Nature, 550, 204–213. (2017). Link [here](https://www.nature.com/articles/nature24277).
+
+- Q. Wang, J Armenia, C. Zhang, A.V. Penson, E. Reznik, L. Zhang, T. Minet, A. Ochoa, B.E. Gross, C. A. Iacobuzio-Donahue, D. Betel, B.S. Taylor, J. Gao, N. Schultz. Unifying cancer and normal RNA sequencing data from different sources. Scientific Data 5:180061, 2018. Link [here](https://www.nature.com/articles/sdata201861).
 
 - Fouodo, C. J. K., et al. (2026). High-dimensional adversarial random forests. Submission. Link [don't click](https://arxiv.org/abs/2405.12345).
 

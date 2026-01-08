@@ -18,14 +18,14 @@ knitr::opts_chunk$set(
 
 ## ----load_libraries, warning = FALSE, message = FALSE-------------------------
 library(harf)
-library(data.table) # install.packages("data.table")
-library(rsvd) # install.packages("rsvd")
-library(Rtsne) # install.packages("Rtsne")
-library(cowplot) # install.packages("cowplot")
-library(SingleCellExperiment) # if (!require("BiocManager", quietly = TRUE)); install.packages("BiocManager"); BiocManager::install("SingleCellExperiment")
-library(ggplot2) # install.packages("ggplot2")
-library(corrplot) # install.packages("corrplot")
-library(scater) # if (!require("BiocManager", quietly = TRUE)); install.packages("BiocManager"); BiocManager::install("scater")
+library(data.table)
+library(rsvd)
+library(Rtsne)
+library(cowplot)
+library(SingleCellExperiment)
+library(ggplot2)
+library(corrplot)
+library(scater)
 
 ## ----data_example, include=TRUE, eval=TRUE, message=FALSE---------------------
 data("single_cell")
@@ -37,7 +37,6 @@ set.seed(123)
 harf_model <- h_arf(
  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
- num_trees = 8,
  parallel = parallel,
  verbose = FALSE
 )
