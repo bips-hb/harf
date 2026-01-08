@@ -52,9 +52,7 @@ HARF model.
 data(single_cell)
 harf_model <- h_arf(
  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
- cli_lab_data = data.frame(cell_type = single_cell$cell_type),
- parallel = TRUE,
- verbose = FALSE
+ cli_lab_data = data.frame(cell_type = single_cell$cell_type)
 )
 ```
 
@@ -63,22 +61,17 @@ harf_model <- h_arf(
 ``` r
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
-  n_synth = nrow(single_cell),
-  evidence = NULL,
-  parallel = TRUE,
-  verbose = FALSE
+  n_synth = nrow(single_cell)
   )
 ```
 
-## Conditional expectations
+## Conditional resampling
 
 ``` r
   lung_single_cell <- h_forge(
       harf_obj = harf_model,
       n_synth = sum(single_cell$cell_type == "lung"),
-      evidence = data.frame(cell_type = "lung"),
-      verbose = FALSE,
-      parallel = TRUE
+      evidence = data.frame(cell_type = "lung")
      )
 ```
 
