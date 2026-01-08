@@ -70,7 +70,6 @@ harf_model <- h_arf(
 ## Generating synthetic data
 
 ``` r
-set.seed(123)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell),
@@ -83,7 +82,6 @@ synth_single_cell <- h_forge(
 ## Conditional expectations
 
 ``` r
-set.seed(142)
   lung_single_cell <- h_forge(
       harf_obj = harf_model,
       n_synth = sum(single_cell$cell_type == "lung"),
@@ -96,11 +94,8 @@ set.seed(142)
 We refer to the package vignette for detailed examples and explanations.
 
 ``` r
-library(harf)
 vignette("harf")
 ```
-
-    ## Warning: vignette 'harf' not found
 
 ## References
 
