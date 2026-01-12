@@ -5,7 +5,7 @@
 \alias{single_cell}
 \title{Example HARF dataset}
 \format{
-An object of class \code{data.frame} with 654 rows and 101 columns.
+An object of class \code{data.frame} with 654 rows and 234 columns.
 }
 \source{
 Data derived from the RNAseqDB repository maintained by Memorial Sloan
