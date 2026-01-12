@@ -440,7 +440,7 @@ code is executed in a <code>CRAN</code> environment, in accordance with
 <code>CRAN</code> policies.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;single_cell&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># Do not parellelize on CRAN</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>parallel <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">Sys.getenv</span>(<span class="st">&quot;NOT_CRAN&quot;</span>) <span class="sc">==</span> <span class="st">&quot;true&quot;</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>)</span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>parallel <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">Sys.getenv</span>(<span class="st">&quot;NOT_CRAN&quot;</span>) <span class="sc">==</span> <span class="st">&quot;true&quot;</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="high-dimensional-adversarial-game" class="section level2" number="3">
 <h2><span class="header-section-number">3</span> High-dimensional

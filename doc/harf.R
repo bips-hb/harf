@@ -36,7 +36,7 @@ set.seed(123, "L'Ecuyer-CMRG")
 ## ----data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
 data("single_cell")
 # Do not parellelize on CRAN
-parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
+parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
 
 ## ----harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE----
 harf_model <- h_arf(

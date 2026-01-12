@@ -85,7 +85,7 @@ executed in a `CRAN` environment, in accordance with `CRAN` policies.
 ```{r data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 data("single_cell")
 # Do not parellelize on CRAN
-parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
+parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
 ```
 
 ## High-dimensional adversarial game
