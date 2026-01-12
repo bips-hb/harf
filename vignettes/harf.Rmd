@@ -1,14 +1,14 @@
 ---
-title: "How does harf work?"
+title: "High-Dimensional Adversarial Random Forests"
 author: "Cesaire Fouodo"
 date: "`r Sys.Date()`"
-output: 
+output:
   rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 3
-    number_sections: true
+    toc: true            # enable table of contents
+    toc_depth: 3         # include headers up to ###
+    number_sections: true  # automatically number sections
 vignette: >
-  %\VignetteIndexEntry{How does harf work?}
+  %\VignetteIndexEntry{High-Dimensional Adversarial Random Forests}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -34,11 +34,7 @@ pre[class] {
 ## Introduction
 
 The R package **harf** is an extension of the adversarial random forests (ARFs) 
-to high-dimensional data. While in high-dimensional settings, the feature distributions 
-are not necessarily independent within terminal nodes, **harf** identifies isolated regions of the feature space in order to better preserve the independence within terminal nodes. This vignette serves as a user guide to use the package effectively.
-Three key functionalities are provided: `h_arf` to train a high-dimensional adversarial 
-random forest (HARF) and `h_forge` for the synthetic  data generating process. This function 
-allows for conditional data generation as well.
+to high-dimensional data. While in high-dimensional settings, the feature distributions  are not necessarily independent within terminal nodes, **harf** identifies isolated regions of the feature space in order to better preserve the independence within terminal nodes. This vignette serves as a user guide to use the package effectively. Two key functionalities are provided: `h_arf` to train and estimate densities in a high-dimensional adversarial random forest (HARF), and `h_forge` for the synthetic data generating process. The `h_forge` function  allows for conditional data generation as well.
 
 ## Libraries and data
 
@@ -61,6 +57,7 @@ BiocManager::install("SingleCellExperiment")
 BiocManager::install("scater")
 install.packages("ggplot2")
 install.packages("corrplot")
+install.packages("doParallel")
 ```
 
 We load the libraries.
@@ -75,32 +72,36 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
+# Register cores - Unix
+library(doParallel)
+registerDoParallel(cores = 2)
+# Set seed
+set.seed(123, "L'Ecuyer-CMRG")
 ```
 
 We load the single_cell dataset and disable parallelization when the code is 
 executed in a `CRAN` environment, in accordance with `CRAN` policies.
 
-```{r data_example, include=TRUE, eval=TRUE, message=FALSE}
+```{r data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 data("single_cell")
 # Do not parellelize on CRAN
 parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
 ```
 
-## Training a harf model #
+## High-dimensional adversarial game
 
-We train a HARF model using the `h_arf` function. The gene expression measurements 
-are provided as the `omx_data` argument, while the cell type information is passed as 
-the `cli_lab_data` argument. we use the default number of trees and other 
-default random forest hyperparameters as specified in the `R` package `ranger`.
+We train a HARF model using the `h_arf` function. The gene expression measurements are provided as the `omx_data` argument, while the cell type information is passed as the `cli_lab_data` argument. 
 
-```{r harf_training, include = TRUE, eval = TRUE, message=FALSE}
-set.seed(123)
+```{r harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE}
 harf_model <- h_arf(
  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+ clara_args = list(samples = 100),
  parallel = parallel,
+ chunck_size = 5,
  verbose = FALSE
 )
+str(harf_model,max.level = 1)
 ```
 
 ## Generating synthetic data
@@ -110,7 +111,6 @@ we generate the same number of synthetic samples as in the original dataset, and
 without any evidence (i.e., unconditional generation).
 
 ```{r harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
-set.seed(123)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell),
@@ -120,7 +120,7 @@ synth_single_cell <- h_forge(
   )
 ```
 
-## Conditional expectations
+## Conditional resampling
 
 For conditional data generation, we generate synthetic samples for each cell type 
 separately. The generated samples are then combined to form the final synthetic
@@ -128,7 +128,6 @@ dataset. Note that our current actual `harf` object allows for conditioning on c
 feature only. 
 
 ```{r harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE}
-set.seed(123)
 single_cell_list <- lapply(unique(single_cell$cell_type), function (ct) {
   ct_synth <- h_forge(
         harf_obj = harf_model,
@@ -181,7 +180,6 @@ conditionally resampled data in a two-dimensional space. We observe that the
 three datasets exhibit similar cluster structure of tissues.
 
 ```{r harf_tsne, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7.1, fig.height = 3.5}
-set.seed(123)
 tsne_it <- function (sc_data, perp = 30, title = "") {
   # Create SingleCellExperiment object
   sce <- SingleCellExperiment::SingleCellExperiment(

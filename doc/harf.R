@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 # BiocManager::install("scater")
 # install.packages("ggplot2")
 # install.packages("corrplot")
+# install.packages("doParallel")
 
 ## ----load_libraries, warning = FALSE, message = FALSE-------------------------
 library(harf)
@@ -26,23 +27,29 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
+# Register cores - Unix
+library(doParallel)
+registerDoParallel(cores = 2)
+# Set seed
+set.seed(123, "L'Ecuyer-CMRG")
 
-## ----data_example, include=TRUE, eval=TRUE, message=FALSE---------------------
+## ----data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
 data("single_cell")
 # Do not parellelize on CRAN
 parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
 
-## ----harf_training, include = TRUE, eval = TRUE, message=FALSE----------------
-set.seed(123)
+## ----harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE----
 harf_model <- h_arf(
  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+ clara_args = list(samples = 100),
  parallel = parallel,
+ chunck_size = 5,
  verbose = FALSE
 )
+str(harf_model,max.level = 1)
 
 ## ----harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
-set.seed(123)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell),
@@ -52,7 +59,6 @@ synth_single_cell <- h_forge(
   )
 
 ## ----harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE----
-set.seed(123)
 single_cell_list <- lapply(unique(single_cell$cell_type), function (ct) {
   ct_synth <- h_forge(
         harf_obj = harf_model,
@@ -89,7 +95,6 @@ plot_corr(cond_synth_clustered, "Conditional resampling")
 par(mfrow = c(1, 1))
 
 ## ----harf_tsne, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7.1, fig.height = 3.5----
-set.seed(123)
 tsne_it <- function (sc_data, perp = 30, title = "") {
   # Create SingleCellExperiment object
   sce <- SingleCellExperiment::SingleCellExperiment(

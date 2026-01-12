@@ -19,6 +19,7 @@
 #' Options include "pearson", "spearman", and "kendall". Default is "spearman".
 #' @param num_clusters Number of clusters to form. If NULL, the optimal number
 #' of clusters is found by finding the elbow method.
+#' @param clara_args A list of additional arguments to pass to the \code{clara} function.
 #' @param num_btwn_pcs Number of principal components to use for between cluster variability.
 #' Usually set to 1 or 2. Default is 2.
 #' @param num_onset_pcs Number of principal components to use for onset features.
@@ -84,6 +85,7 @@ h_arf <- function (
     encoder = "fastcor",
     correlation_method = "spearman",
     num_clusters = NULL,
+    clara_args = list(samples = 50),
     num_btwn_pcs = 2,
     num_onset_pcs = 2,
     chunck_size = 10,
@@ -167,12 +169,24 @@ h_arf <- function (
     stop("RFAE encoder not yet implemented.")
   }
   # kmeans clustering around medoids
-  dist_features <- dist(projected_data)
   if (!is.null(num_clusters)) {
     k_pcs <- num_clusters
   }
-  pam_fit <- pam(dist_features, k = k_pcs, diss = TRUE)
-  feature_clusters <- pam_fit$clustering
+  # dist_features <- dist(projected_data)
+  # pam_fit <- cluster::pam(dist_features, k = k_pcs, diss = TRUE, variant = "faster")
+  # feature_clusters <- pam_fit$clustering
+  # Build clara arguments
+  final_clara_args <- c(
+    list(
+      x = projected_data,
+      k = k_pcs
+    ),
+    clara_args
+  )
+  # # Perform clara clustering with do.call
+  clara_fit <- do.call(what = "clara",
+                           args = final_clara_args)
+  feature_clusters <- clara_fit$clustering
   # Re-split clusters that are larger than chunck_size
   if (!is.null(chunck_size)) {
     max_cluster_size <- chunck_size
@@ -181,12 +195,25 @@ h_arf <- function (
       ftr_in_cluster <- which(feature_clusters == cluster)
       if (length(ftr_in_cluster) > max_cluster_size) {
         num_subclusters <- ceiling(length(ftr_in_cluster) / max_cluster_size)
-        sub_pam_fit <- pam(
-          projected_data[ftr_in_cluster, ],
-          k = num_subclusters,
-          diss = FALSE
+        # sub_pam_fit <- cluster::pam(
+        #   projected_data[ftr_in_cluster, ],
+        #   k = num_subclusters,
+        #   diss = FALSE,
+        #   variant = "faster"
+        # )
+        # sub_clusters <- sub_pam_fit$clustering
+        # Build clara arguments for sub clustering
+        final_clara_args <- c(
+          list(
+            x = projected_data[ftr_in_cluster, ],
+            k = num_subclusters
+          ),
+          clara_args
         )
-        sub_clusters <- sub_pam_fit$clustering
+        # # Perform clara clustering with do.call
+        sub_clara_fit <- do.call(what = "clara",
+                                     args = final_clara_args)
+        sub_clusters <- sub_clara_fit$clustering
         for (sub_cluster in unique(sub_clusters)) {
           ftr_in_subcluster <- ftr_in_cluster[sub_clusters == sub_cluster]
           feature_clusters[ftr_in_subcluster] <- new_cluster_id

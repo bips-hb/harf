@@ -13,6 +13,7 @@ h_arf(
   encoder = "fastcor",
   correlation_method = "spearman",
   num_clusters = NULL,
+  clara_args = list(samples = 20),
   num_btwn_pcs = 2,
   num_onset_pcs = 2,
   chunck_size = 10,
@@ -48,6 +49,8 @@ Options include "pearson", "spearman", and "kendall". Default is "spearman".}
 
 \item{num_clusters}{Number of clusters to form. If NULL, the optimal number
 of clusters is found by finding the elbow method.}
+
+\item{clara_args}{A list of additional arguments to pass to the \code{clara} function.}
 
 \item{num_btwn_pcs}{Number of principal components to use for between cluster variability.
 Usually set to 1 or 2. Default is 2.}

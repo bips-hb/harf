@@ -2,7 +2,7 @@
 
 export(h_arf)
 export(h_forge)
-importFrom(cluster,pam)
+importFrom(cluster,clara)
 importFrom(fastPLS,fastcor)
 importFrom(foreach,"%do%")
 importFrom(foreach,"%dopar%")

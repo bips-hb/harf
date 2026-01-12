@@ -1,6 +1,6 @@
 Package: harf
 Title: High-dimensional Adversarial Random Forests
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: c(person(given = c("Cesaire", "J."),
                       family = c("K.", "Fouodo"),
                       role = c("aut", "cre"),
@@ -31,7 +31,8 @@ Suggests:
     corrplot,
     scater,
     cowplot,
-    ggplot2
+    ggplot2,
+    doParallel
 Config/testthat/edition: 3
 Depends: R (>= 3.6.0)
 Collate: 
