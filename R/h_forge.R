@@ -155,11 +155,9 @@ h_forge <- function (
   }
   # If parallel is TRUE, use dopar
   if (parallel) {
-    synth_omx_data_list <- foreach(i = 1:length(harf_obj$models),
-                                   .export = c("n_synth")) %dopar% synth_omx(i)
+    synth_omx_data_list <- foreach(i = 1:length(harf_obj$models)) %dopar% synth_omx(i)
   } else {
-    synth_omx_data_list <- foreach(i = 1:length(harf_obj$models),
-                                   .export = c("n_synth")) %do% synth_omx(i)
+    synth_omx_data_list <- foreach(i = 1:length(harf_obj$models)) %do% synth_omx(i)
   }
   # Combine all synthetic omics data
   synth_omx_data <- do.call(cbind, synth_omx_data_list)
