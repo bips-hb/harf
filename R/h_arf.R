@@ -80,7 +80,7 @@ h_arf <- function (
     omx_data,
     cli_lab_data = NULL,
     omx_onset_data = NULL,
-    num_trees = 20,
+    num_trees = 10,
     min_node_size = 5,
     encoder = "fastcor",
     correlation_method = "spearman",

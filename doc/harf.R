@@ -36,7 +36,7 @@ set.seed(123, "L'Ecuyer-CMRG")
 ## ----data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
 data("single_cell")
 # Do not parellelize on CRAN
-parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", TRUE, FALSE)
+parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
 
 ## ----harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE----
 harf_model <- h_arf(
@@ -78,6 +78,8 @@ setorder(cluster_feature, cluster)
 orig_clustered <- single_cell[ , c("cell_type", cluster_feature$feature)]
 synth_clustered <- as.data.frame(synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
 cond_synth_clustered <- as.data.frame(cond_synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
+# Find the two largest clusters
+
 plot_corr <- function(dt, title) {
   corr_matrix <- cor(dt[ , 2:51], method = "spearman")
   corrplot(corr_matrix,
