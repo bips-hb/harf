@@ -13,7 +13,7 @@ h_arf(
   encoder = "fastcor",
   correlation_method = "spearman",
   num_clusters = NULL,
-  clara_args = list(samples = 20),
+  clara_args = list(samples = 50),
   num_btwn_pcs = 2,
   num_onset_pcs = 2,
   chunck_size = 10,

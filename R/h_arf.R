@@ -39,7 +39,7 @@
 #'
 #' @returns An isoARF object containing the fitted adversarial models, and clustering
 #' information.
-#' @importFrom cluster pam
+#' @importFrom cluster clara
 #' @importFrom rsvd rpca
 #' @importFrom foreach %do% %dopar% foreach
 #' @importFrom fastPLS fastcor
