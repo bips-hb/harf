@@ -52,7 +52,7 @@ str(harf_model,max.level = 1)
 ## ----harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
-  n_synth = nrow(single_cell),
+  n_synth = nrow(single_cell), 
   evidence = NULL,
   parallel = parallel,
   verbose = FALSE
