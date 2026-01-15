@@ -19,7 +19,6 @@
 #' Options include "pearson", "spearman", and "kendall". Default is "spearman".
 #' @param num_clusters Number of clusters to form. If NULL, the optimal number
 #' of clusters is found by finding the elbow method.
-#' @param clara_args A list of additional arguments to pass to the \code{clara} function.
 #' @param num_btwn_pcs Number of principal components to use for between cluster variability.
 #' Usually set to 1 or 2. Default is 2.
 #' @param num_onset_pcs Number of principal components to use for onset features.
@@ -39,11 +38,9 @@
 #'
 #' @returns An isoARF object containing the fitted adversarial models, and clustering
 #' information.
-#' @importFrom cluster clara
-#' @importFrom rsvd rpca
-#' @importFrom foreach %do% %dopar% foreach
+#' @importFrom ClusterR KMeans_rcpp
 #' @importFrom fastPLS fastcor
-#' @importFrom gmodels fast.prcomp
+#' @importFrom rsvd rpca
 #' @importFrom stats cor dist prcomp
 #' @export
 #' @seealso [h_forge], [arf::adversarial_rf], [arf::forde]
@@ -85,7 +82,6 @@ h_arf <- function (
     encoder = "fastcor",
     correlation_method = "spearman",
     num_clusters = NULL,
-    clara_args = list(samples = 50),
     num_btwn_pcs = 2,
     num_onset_pcs = 2,
     chunck_size = 10,
@@ -141,19 +137,17 @@ h_arf <- function (
   # Encoding via fast correlation and PCA
   if (encoder == "fastcor") {
     if (correlation_method == "spearman") {
-      cor_matrix <- fastcor(as.matrix(omx_data))
+      cor_matrix <- fastcor(t(as.matrix(omx_data)))
     } else {
       # TODO: Fix me by using a fast correlation function that supports pearson and kendall
       cor_matrix <- cor(as.matrix(omx_data), method = correlation_method)
     }
 
     # PCA and elbow point detection to determine optimal number of clusters
-    pca_res <- fast.prcomp(cor_matrix, retx = TRUE, center = TRUE, scale. = TRUE)
-    variances <- pca_res$sdev^2
-    k_pcs <- find_elbow(variances)
-    selected_pcs <- pca_res$rotation[, 1:k_pcs, drop = FALSE]
-    # Projected omx_data onto pcs with crossprod
-    projected_data <- as.data.frame(crossprod(as.matrix(omx_data), as.matrix(selected_pcs)))
+    projected_data <- fast.pca(
+      X = cor_matrix,
+      K = min(100, ncol(cor_matrix) - 1)
+    )
   }
   # Encoding via RFAE
   if (encoder == "RFAE") {
@@ -169,56 +163,34 @@ h_arf <- function (
     stop("RFAE encoder not yet implemented.")
   }
   # kmeans clustering around medoids
-  if (!is.null(num_clusters)) {
-    k_pcs <- num_clusters
-  }
-  # dist_features <- dist(projected_data)
-  # pam_fit <- cluster::pam(dist_features, k = k_pcs, diss = TRUE, variant = "faster")
-  # feature_clusters <- pam_fit$clustering
-  # Build clara arguments
-  final_clara_args <- c(
-    list(
-      x = projected_data,
-      k = k_pcs
-    ),
-    clara_args
-  )
-  # # Perform clara clustering with do.call
-  clara_fit <- do.call(what = "clara",
-                           args = final_clara_args)
-  feature_clusters <- clara_fit$clustering
+  kmeanpp_fit <- KMeans_rcpp(projected_data,
+                             clusters = floor(ncol(omx_data) / chunck_size),
+                             num_init = 5,
+                             max_iters = 100,
+                             initializer = 'kmeans++')
+  # feature_clusters <- clara_fit$clustering
+  feature_clusters <- kmeanpp_fit$clusters
   # Re-split clusters that are larger than chunck_size
-  if (!is.null(chunck_size)) {
+  # if (!is.null(chunck_size)) {
+  cluster_splitting <- TRUE
+    while (cluster_splitting) {
     max_cluster_size <- chunck_size
     new_cluster_id <- max(feature_clusters) + 1
+    cluster_splitting <- FALSE
     for (cluster in unique(feature_clusters)) {
       ftr_in_cluster <- which(feature_clusters == cluster)
-      if (length(ftr_in_cluster) > max_cluster_size) {
+      if (length(ftr_in_cluster) > max_cluster_size + 1) {
+        cluster_splitting <- TRUE
         num_subclusters <- ceiling(length(ftr_in_cluster) / max_cluster_size)
-        # sub_pam_fit <- cluster::pam(
-        #   projected_data[ftr_in_cluster, ],
-        #   k = num_subclusters,
-        #   diss = FALSE,
-        #   variant = "faster"
-        # )
-        # sub_clusters <- sub_pam_fit$clustering
-        # Build clara arguments for sub clustering
-        final_clara_args <- c(
-          list(
-            x = projected_data[ftr_in_cluster, ],
-            k = num_subclusters
-          ),
-          clara_args
-        )
-        # # Perform clara clustering with do.call
-        sub_clara_fit <- do.call(what = "clara",
-                                     args = final_clara_args)
-        sub_clusters <- sub_clara_fit$clustering
-        for (sub_cluster in unique(sub_clusters)) {
-          ftr_in_subcluster <- ftr_in_cluster[sub_clusters == sub_cluster]
-          feature_clusters[ftr_in_subcluster] <- new_cluster_id
-          new_cluster_id <- new_cluster_id + 1
-        }
+
+        kmeanpp_fit <- KMeans_rcpp(projected_data[ftr_in_cluster, ],
+                                   clusters = num_subclusters,
+                                   num_init = 5,
+                                   max_iters = 100,
+                                   initializer = 'kmeans++')
+
+        sub_clusters <- kmeanpp_fit$clusters + max(feature_clusters)
+        feature_clusters[ftr_in_cluster] <- sub_clusters
       }
     }
   }
@@ -334,7 +306,8 @@ h_arf <- function (
   arf_clusters <- function(cluster) {
     if (isTRUE(verbose)) {
       message(paste0("Fitting ARF model for cluster ",
-                     cluster, " of ", length(unique(feature_clusters)),
+                     which(sort(unique(feature_clusters)) == cluster),
+                     " of ", length(unique(feature_clusters)),
                      " clusters...\n"))
     }
     ftr_in_cluster <- which(feature_clusters == cluster)
@@ -363,17 +336,15 @@ h_arf <- function (
     )
     # Export the iso_arf object
     return(list(cluster_id = cluster,
-                ftr_in_cluster = names(ftr_in_cluster),
+                ftr_in_cluster = colnames(omx_data)[ftr_in_cluster],
                 iso_arf = iso_arf,
                 iso_forde = iso_forde))
   }
-  if (isFALSE(parallel)) {
-    # Use for loop if parallel is FALSE
-    arf_models <- foreach(cluster = sort(unique(feature_clusters))) %do% arf_clusters(cluster)
-  } else {
-    # Use dopar if parallel is TRUE
-    arf_models <- foreach(cluster = sort(unique(feature_clusters))) %dopar% arf_clusters(cluster)
-  }
+
+  arf_models <- lapply(
+    sort(unique(feature_clusters)),
+    arf_clusters
+  )
   # Export feature_cluster_df and meta to arf_models as well.
   hd_arf <- list(meta_model = meta_model,
                  models = arf_models,

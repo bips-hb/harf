@@ -16,10 +16,10 @@ Imports:
     arf,
     data.table,
     stats,
-    cluster,
+    ClusterR,
+    matrixStats,
+    pracma,
     fastPLS,
-    foreach,
-    gmodels,
     rsvd
 Suggests: 
     testthat (>= 3.0.0),

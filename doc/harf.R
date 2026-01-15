@@ -44,8 +44,8 @@ harf_model <- h_arf(
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
  clara_args = list(samples = 100),
  parallel = parallel,
- chunck_size = 5,
- verbose = FALSE
+ chunck_size = 20,
+ verbose = TRUE
 )
 str(harf_model,max.level = 1)
 

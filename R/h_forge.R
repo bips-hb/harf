@@ -24,7 +24,6 @@
 #' @param parallel Compute in parallel? See \code{forde} for details.
 #'
 #' @returns A data.table containing the generated synthetic omics data.
-#' @importFrom foreach %do% %dopar% foreach
 #' @seealso \code{\link[arf]{forge}} for details on the forging process.
 #' @export
 #' @author Césaire Fouodo
@@ -69,7 +68,6 @@ h_forge <- function (
     stepsize = 0,
     parallel = TRUE
 ) {
-  i <- NULL  # To avoid R CMD check note for foreach
   # Test that harf_obj is of class harf
   if (!inherits(harf_obj, "harf")) {
     stop("harf_obj must be an object of class 'harf'.")
@@ -147,17 +145,15 @@ h_forge <- function (
       nomatch = nomatch,
       verbose = verbose,
       stepsize = stepsize,
-      parallel = parallel
+      parallel = FALSE
     )
     # Dataset to be kept
     synth_data <- synth_data[ , harf_obj$models[[mdl_idx]]$ftr_in_cluster, drop = FALSE]
     return(synth_data)
   }
-  # If parallel is TRUE, use dopar
-  if (parallel) {
-    synth_omx_data_list <- foreach(i = 1:length(harf_obj$models)) %dopar% synth_omx(i)
-  } else {
-    synth_omx_data_list <- foreach(i = 1:length(harf_obj$models)) %do% synth_omx(i)
+  synth_omx_data_list <- vector("list", length(harf_obj$models))
+  for (i in 1:length(harf_obj$models)) {
+    synth_omx_data_list[[i]] <- synth_omx(i)
   }
   # Combine all synthetic omics data
   synth_omx_data <- do.call(cbind, synth_omx_data_list)

@@ -40,7 +40,7 @@ to high-dimensional data. While in high-dimensional settings, the feature distri
 
 The data used in this vignette are included in the *harf* package and originate from The Cancer Genome Atlas (TCGA) and the Genotype-Tissue Expression (GTEx) projects, two large-scale public resources providing extensive RNA-seq data. The data were extracted from previously processed and curated datasets generated using the pipeline described in Aguet et al. (2017).
 
-The built-in dataset `single_cell`, distributed with *harf*, contains $233$ log-transformed gene expression measurements from $654$ cells collected across $15$ human tissues, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
+The built-in dataset `single_cell`, distributed with *harf*, contains $233$ log-transformed gene expression measurements from $654$ cells collected across $10$ human organes, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
 
 In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The HARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be either categorical or numeric. In this vignette, gene expression measurements are used as the omics data, while cell type serves as the clinical or phenotypic variable.
 
@@ -98,8 +98,8 @@ harf_model <- h_arf(
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
  clara_args = list(samples = 100),
  parallel = parallel,
- chunck_size = 5,
- verbose = FALSE
+ chunck_size = 20,
+ verbose = TRUE
 )
 str(harf_model,max.level = 1)
 ```
