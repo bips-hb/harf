@@ -42,12 +42,27 @@ parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
 harf_model <- h_arf(
  omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
  cli_lab_data = data.frame(cell_type = single_cell$cell_type),
- clara_args = list(samples = 100),
  parallel = parallel,
- chunck_size = 20,
+ chunck_size = 5,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
+
+## ----harf_accuracy, include = TRUE, eval = TRUE, message=FALSE, fig.width = 5, fig.height = 3----
+acc_df <- data.frame(
+  Region = names(harf_model$accuracy),
+  Accuracy = harf_model$accuracy
+)
+acc_plot <- ggplot2::ggplot(acc_df, ggplot2::aes(x = Region, y = Accuracy)) +
+  ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") +
+  ggplot2::geom_bar(stat = "identity", fill = "steelblue") +
+  ggplot2::ylim(0, 1) +
+  ggplot2::labs(title = "HARF Convergence Accuracy",
+                x = "Regions",
+                y = "Accuracy") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
+acc_plot
 
 ## ----harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
 synth_single_cell <- h_forge(

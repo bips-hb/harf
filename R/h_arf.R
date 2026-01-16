@@ -142,12 +142,6 @@ h_arf <- function (
       # TODO: Fix me by using a fast correlation function that supports pearson and kendall
       cor_matrix <- cor(as.matrix(omx_data), method = correlation_method)
     }
-
-    # PCA and elbow point detection to determine optimal number of clusters
-    projected_data <- fast.pca(
-      X = cor_matrix,
-      K = min(100, ncol(cor_matrix) - 1)
-    )
   }
   # Encoding via RFAE
   if (encoder == "RFAE") {
@@ -162,6 +156,11 @@ h_arf <- function (
     # projected_data <- as.data.frame(omx_rfae$Z)
     stop("RFAE encoder not yet implemented.")
   }
+  # PCA with encoded data
+  projected_data <- fast.pca(
+    X = cor_matrix,
+    K = min(100, ncol(cor_matrix) - 1)
+  )
   # kmeans clustering around medoids
   kmeanpp_fit <- KMeans_rcpp(projected_data,
                              clusters = floor(ncol(omx_data) / chunck_size),
@@ -278,6 +277,9 @@ h_arf <- function (
     meta_features <- data.frame(meta_features, cli_lab_data)
   }
   # Run the meta adversarial game
+  acc <- vector(mode = "numeric", length = length(unique(feature_clusters)) + 1L)
+  names(acc) <- c("meta_model",
+                      paste0("cluster_", sort(unique(feature_clusters))))
   if (isTRUE(verbose)) {
     message("Fitting meta-cluster ARF model...\n")
   }
@@ -287,6 +289,7 @@ h_arf <- function (
     min_node_size = min_node_size,
     verbose = verbose
   )
+  acc["meta_model"] <- meta_arf$acc[length(meta_arf$acc)]
   # Density estimation for meta model
   meta_forde <- arf::forde(
     arf = meta_arf,
@@ -322,7 +325,6 @@ h_arf <- function (
       min_node_size = min_node_size,
       verbose = verbose
     )
-
     # Density estimation
     iso_forde <- arf::forde(
       arf = iso_arf,
@@ -345,6 +347,11 @@ h_arf <- function (
     sort(unique(feature_clusters)),
     arf_clusters
   )
+  # Save accuracy for each cluster model
+  for (i in seq_along(arf_models)) {
+    acc[paste0("cluster_", arf_models[[i]]$cluster_id)] <-
+      arf_models[[i]]$iso_arf$acc[length(arf_models[[i]]$iso_arf$acc)]
+  }
   # Export feature_cluster_df and meta to arf_models as well.
   hd_arf <- list(meta_model = meta_model,
                  models = arf_models,
@@ -354,7 +361,8 @@ h_arf <- function (
                  ),
                  meta_features = meta_features,
                  omx_features = cln_omx_data,
-                 cli_lab_features = cln_cli_lab_data
+                 cli_lab_features = cln_cli_lab_data,
+                 accuracy = acc
   )
   class(hd_arf) <- "harf"
   return(hd_arf)
