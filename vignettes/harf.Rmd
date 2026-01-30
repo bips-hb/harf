@@ -1,5 +1,5 @@
 ---
-title: "High-Dimensional Adversarial Random Forests"
+title: "High-Dimensional Adversarial Random Forests for Omics Data"
 author: "Cesaire Fouodo"
 date: "`r Sys.Date()`"
 output:
@@ -8,7 +8,7 @@ output:
     toc_depth: 3         # include headers up to ###
     number_sections: true  # automatically number sections
 vignette: >
-  %\VignetteIndexEntry{High-Dimensional Adversarial Random Forests}
+  %\VignetteIndexEntry{High-Dimensional Adversarial Random Forests for Omics Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -34,15 +34,11 @@ pre[class] {
 ## Introduction
 
 The R package **harf** is an extension of the adversarial random forests (ARFs) 
-to high-dimensional data. While in high-dimensional settings, the feature distributions  are not necessarily independent within terminal nodes, **harf** identifies isolated regions of the feature space in order to better preserve the independence within terminal nodes. This vignette serves as a user guide to use the package effectively. Two key functionalities are provided: `h_arf` to train and estimate densities in a high-dimensional adversarial random forest (HARF), and `h_forge` for the synthetic data generating process. The `h_forge` function  allows for conditional data generation as well.
+to high-dimensional data. This vignette serves as a user guide to use the package effectively. Two key functionalities are provided: `h_arf` to train and estimate densities in a high-dimensional adversarial random forest (HARF), and `h_forge` for the synthetic data generating process. The `h_forge` function  allows for conditional data generation as well.
 
 ## Libraries and data
 
-The data used in this vignette are included in the *harf* package and originate from The Cancer Genome Atlas (TCGA) and the Genotype-Tissue Expression (GTEx) projects, two large-scale public resources providing extensive RNA-seq data. The data were extracted from previously processed and curated datasets generated using the pipeline described in Aguet et al. (2017).
-
-The built-in dataset `single_cell`, distributed with *harf*, contains $233$ log-transformed gene expression measurements from $654$ cells collected across $10$ human organes, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
-
-In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The HARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be either categorical or numeric. In this vignette, gene expression measurements are used as the omics data, while cell type serves as the clinical or phenotypic variable.
+The package single cell built-in dataset `single_cell` used in this vignette are included in the *harf* package and originate from The Cancer Genome Atlas (TCGA) and the Genotype-Tissue Expression (GTEx) projects, two large-scale public resources providing extensive RNA-seq data. The data were extracted from previously processed and curated datasets generated using the pipeline described in Aguet et al. (2017). This pipeline ensures log-transformed gene measurements, expressed in at least $6\%$ of cells. To keep the computational burden manageable for this vignette, we randomly selected $100$ genes and $2061$ from the original dataset. The included cells are grouped by human organes, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
 
 We start by installing the required packages if you have not already done so.
 
@@ -79,6 +75,8 @@ registerDoParallel(cores = 2)
 set.seed(123, "L'Ecuyer-CMRG")
 ```
 
+In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The HARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be mixed (categorical or numeric). In the following example, gene expression measurements are used as the omics data, while cell type serves as the clinical or phenotypic variable.
+
 We load the single_cell dataset and disable parallelization when the code is 
 executed in a `CRAN` environment, in accordance with `CRAN` policies.
 
@@ -90,22 +88,26 @@ parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
 
 ## High-dimensional adversarial game
 
-We train a HARF model using the `h_arf` function. The gene expression measurements are provided as the `omx_data` argument, while the cell type information is passed as the `cli_lab_data` argument. 
+We train a HARF model using the `h_arf` function. The gene expression measurements are provided as the `omx_data` argument, while the cell type information is passed as the `cli_lab_data` argument. We set the maximal chunk size to $5$, to specify that maximal number of features allowed in an isolated region. This parameter is crucial for three main aspects, including (i) controlling the convergence of ARF in the isolated regions, (ii) learning the original correlation pattern between features instead of using meta-feature, and (iii) managing the runtime. We generally used the default chunk size of $10$ for our paper.
 
 ```{r harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE}
+my_omx_data <- single_cell[ , - which(colnames(single_cell)  == "cell_type")]
+my_cli_lab_data <- data.frame(cell_type = single_cell$cell_type)
 harf_model <- h_arf(
- omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
- cli_lab_data = data.frame(cell_type = single_cell$cell_type),
+ omx_data = my_omx_data,
+ cli_lab_data = my_cli_lab_data,
+ target = "cell_type",
  parallel = parallel,
- chunck_size = 5,
+ chunck_size = 4,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
 ```
 
 ## Inspect accuracy of the HARF model
-We plot the accuracy of the HARF model across the training regions and the meta region.
-```{r harf_accuracy, include = TRUE, eval = TRUE, message=FALSE, fig.width = 5, fig.height = 3}
+We plot the accuracy of the HARF model across the training regions and the meta region to ensure that the adversarial game has converged properly. An accuracy close to $0.5$ indicates that the ARF model cannot distinguish between original and synthetic data, suggesting successful convergence. In contrast, an accuracy significantly higher than $0.5$ may indicate that the ARF has not fully captured the data distribution, potentially leading to suboptimal chunk size.
+
+```{r harf_accuracy, include = TRUE, eval = TRUE, message=FALSE, fig.width = 7, fig.height = 3}
 acc_df <- data.frame(
   Region = names(harf_model$accuracy),
   Accuracy = harf_model$accuracy
@@ -124,9 +126,7 @@ acc_plot
 
 ## Generating synthetic data
 
-The `h_forge` function generates synthetic data from a trained HARF model. Here, 
-we generate the same number of synthetic samples as in the original dataset, and 
-without any evidence (i.e., unconditional generation).
+The `h_forge` function generates synthetic data from a trained HARF model. Here, we generate the same number of synthetic samples as in the original dataset, and without any evidence (i.e., unconditional generation).
 
 ```{r harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
 synth_single_cell <- h_forge(
@@ -138,66 +138,31 @@ synth_single_cell <- h_forge(
   )
 ```
 
-## Conditional resampling
-
-For conditional data generation, we generate synthetic samples for each cell type 
-separately. The generated samples are then combined to form the final synthetic
-dataset. Note that our current actual `harf` object allows for conditioning on clinical 
-feature only. 
-
-```{r harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE}
-single_cell_list <- lapply(unique(single_cell$cell_type), function (ct) {
-  ct_synth <- h_forge(
-        harf_obj = harf_model,
-        n_synth = sum(single_cell$cell_type == ct),
-        evidence = data.frame(cell_type = ct),
-        verbose = FALSE,
-        parallel = parallel
-      )
-  return(ct_synth)
-})
-cond_synth_single_cell <- do.call(rbind, single_cell_list)
-```
-
 ## Comparaison of correlation matrices
 
-We visually compare the correlation matrices of the original data, the synthetic data, 
-and the conditionally resampled data. To enhance interpretability, we rearrange the features 
-according to their cluster assignments obtained from the HARF model. The correlation 
-plots exhibit similar patterns across the three datasets, indicating that the HARF model 
-effectively preserve the origin feature correlation structure.
+We visually compare the correlation matrices of the original data and the synthetic data. To enhance interpretability, we rearrange the features 
+according to their region assignments obtained from the HARF model. The correlation plots exhibit similar patterns across the three datasets, indicating that the HARF model effectively preserve the origin feature correlation structure.
 
-```{r harf_correlation_matrices, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7, fig.height = 6.5}
+```{r harf_correlation_matrices, include = TRUE, eval = TRUE, message = FALSE, fig.width = 3.5, fig.height = 3}
 # Re-arrange data by grouping gene by clusters
 cluster_feature <- copy(harf_model$cluster)
 setorder(cluster_feature, cluster)
 orig_clustered <- single_cell[ , c("cell_type", cluster_feature$feature)]
 synth_clustered <- as.data.frame(synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
-cond_synth_clustered <- as.data.frame(cond_synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
-# Find the two largest clusters
-
 plot_corr <- function(dt, title) {
   corr_matrix <- cor(dt[ , 2:51], method = "spearman")
   corrplot(corr_matrix,
            method = "circle",
            tl.col = "black",
            tl.pos = "n",
-           # tl.srt = 45,
            title = title,
            mar = c(0, 0, 1, 0))
 }
-par(mfrow = c(2,2))
-plot_corr(orig_clustered, "Original")
-plot_corr(synth_clustered, "Synthetic")
-plot_corr(cond_synth_clustered, "Conditional resampling")
-par(mfrow = c(1, 1))
 ```
 
 ## Show original and synthetic data in 2D using t-SNE
 
-We use t-SNE to visualize the original data, the synthetic data, and the 
-conditionally resampled data in a two-dimensional space. We observe that the 
-three datasets exhibit similar cluster structure of tissues.
+We use t-SNE to visualize cells in a two-dimensional space. Original cell clusters are preserved in the synthetic data, indicating that the HARF model effectively captures the underlying cluster structure of the original data.
 
 ```{r harf_tsne, include = TRUE, eval = TRUE, message = FALSE, fig.width = 7.1, fig.height = 3.5}
 tsne_it <- function (sc_data, perp = 30, title = "") {
@@ -228,16 +193,23 @@ orig_plot <- tsne_it(single_cell,
 synth_plot <- tsne_it(as.data.frame(synth_single_cell),
                       perp = 30,
                       title = "Synthetic")
-cond_synth_plot <- tsne_it(as.data.frame(cond_synth_single_cell),
-                           perp = 30,
-                           title = "Conditional resampling")
 legend <- cowplot::get_legend(
   orig_plot + theme(legend.position = "bottom")
 )
 orig_plot <- orig_plot + theme(legend.position = "none")
 synth_plot <- synth_plot + theme(legend.position = "none")
-cond_synth_plot <- cond_synth_plot + theme(legend.position = "none")
-all_plots <- cowplot::plot_grid(orig_plot, synth_plot, cond_synth_plot, ncol = 3)
+all_plots <- cowplot::plot_grid(orig_plot,
+                                synth_plot,
+                                ncol = 2)
+par(mfrow = c(1,2))
+plot_corr(orig_clustered, "Original")
+plot_corr(synth_clustered, "Synthetic")
+par(mfrow = c(1, 1))
+print(all_plots)
+```
+
+```{r harf_tsne_plot, include = FALSE, eval = FALSE, message = FALSE, fig.width = 7, fig.height = 6.5}
+par(mfrow = c(1, 1))
 plot_grid(
   all_plots,
   legend,
@@ -246,11 +218,56 @@ plot_grid(
 )
 ```
 
+## Conditional resampling
+
+For conditional data generation, we generate synthetic samples for each organ separately. The generated samples are then combined to form the final synthetic dataset. 
+
+```{r harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE, fig.width = 7, fig.height = 3.5}
+sub_cell_type <- c("lung", "liver", "esophagus_muc")
+single_cell_list <- lapply(sub_cell_type, function (ct) {
+  ct_synth <- h_forge(
+        harf_obj = harf_model,
+        n_synth = sum(single_cell$cell_type == ct),
+        evidence = data.frame(cell_type = ct),
+        verbose = FALSE,
+        parallel = parallel
+      )
+  return(ct_synth)
+})
+cond_synth_single_cell <- do.call(rbind, single_cell_list)
+cond_synth_clustered <- as.data.frame(cond_synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
+cond_synth_plot <- tsne_it(as.data.frame(cond_synth_single_cell),
+                           perp = 30,
+                           title = "Conditional resampling")
+sub_legend <- cowplot::get_legend(
+  cond_synth_plot + theme(legend.position = "none")
+)
+cond_synth_plot <- cond_synth_plot + theme(legend.position = "none")
+sub_single_cell <- orig_clustered[orig_clustered$cell_type %in% sub_cell_type , ]
+sub_orig_plot <- tsne_it(sub_single_cell,
+                     perp = 30,
+                     title = "Original")
+legend <- cowplot::get_legend(
+  orig_plot + theme(legend.position = "bottom")
+)
+sub_all_plots <- cowplot::plot_grid(sub_orig_plot,
+                                cond_synth_plot,
+                                ncol = 2)
+par(mfrow = c(1,2))
+plot_corr(sub_single_cell, "Original")
+plot_corr(cond_synth_clustered, "Synthetic")
+par(mfrow = c(1, 1))
+plot_grid(sub_all_plots, sub_legend, ncol = 1, rel_heights = c(1, 0.2))
+par(mfrow = c(1, 1))
+```
+
+Again, both the correlation structure and the cluster structure are well preserved in the conditionally generated synthetic data.
+
 ## Conclusion
 
-We introduced the R package **harf**, which enables the generation of high-dimensional synthetic data. The package extends the adversarial random forest framework to effectively handle high-dimensional omics data and supports both unconditional and conditional data generation. Using visual comparisons based on correlation matrices and `t-SNE` projections, we showed that the synthetic data produced by **harf** closely resemble the original data in terms of feature correlations and underlying cluster structure.
+We introduced the R package **harf**, which enables the generation of high-dimensional synthetic data. The package extends the adversarial random forest framework to effectively handle high-dimensional omics data and supports both unconditional and conditional data generation. Although the presented example is based on single-cell RNA-seq data clustering, the usage is strongly similar for classification purposes. We refer to our paper for more details.
 
-While **harf** enables the simultaneous generation of both omics and clinical data, it requires that features be clustered prior to training the HARF model. This step may be challenging in situations where features do not naturally form clusters or when the optimal number of clusters or feature groups is not easily determined. Future work could explore adaptive clustering strategies or methods that relax this requirement to further improve usability in diverse high-dimensional settings. 
+Feature clustering is a crucial step in the HARF procedure, as it defines isolated regions where separate ARFs are trained. The choice of chunk size, which determines the maximum number of features allowed in each isolated region, may considerably impacts the performance of the HARF model. A small chunk size leads to more isolated regions with fewer features, guarantees good ARF convergence rate, but imposes the stronger impact of more meta-features to capture dependencies between regions and longer computation time. In contrary, a large chunk size results in fewer regions with more features per region, allows for learning the original feature correlation pattern by minimizing the impact of meta-features, and can speed up the runtime. However, large chnk size may negatively impact the ARF convergence behavior. Finally, The choice of chunk size should consider the trade-off between capturing isolated data structures and maintaining sufficient data within each region for effective training. 
 
 ## References
 

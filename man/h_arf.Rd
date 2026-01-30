@@ -7,16 +7,17 @@
 h_arf(
   omx_data,
   cli_lab_data = NULL,
+  target = NULL,
   omx_onset_data = NULL,
   num_trees = 10,
   min_node_size = 5,
-  encoder = "fastcor",
   correlation_method = "spearman",
   num_clusters = NULL,
   num_btwn_pcs = 2,
   num_onset_pcs = 2,
   chunck_size = 10,
   oob = FALSE,
+  always_split_meta = FALSE,
   family = "truncnorm",
   finite_bounds = "no",
   alpha = 0,
@@ -34,16 +35,16 @@ represent samples (e.g. patients or cells) and columns represent features
 this may be a data.frame where rows represent cell types (for single cell data)
 or additional clinical patient information (e.g. disease status).}
 
+\item{target}{Optional name of the target variable in \code{cli_lab_data} for supervised
+dimension reduction. If NULL, unsupervised dimension reduction is performed.}
+
 \item{omx_onset_data}{Optional data.frame of conditional onset omics features.}
 
 \item{num_trees}{Number of trees to grow in each Adversarial Random Forest (ARF) model.}
 
 \item{min_node_size}{Minimum number of samples required to split an internal node in the ARF model.}
 
-\item{encoder}{Method to use for encoding. Currently,
-only \code{fastcor} and Random Forest Auto-Encoder (\code{RFAE}) supported. Default is "fastcor".}
-
-\item{correlation_method}{Methods to compute correlation between features. Only useful for the \code{fastcor} encoder.
+\item{correlation_method}{Methods to compute correlation between features.
 Options include "pearson", "spearman", and "kendall". Default is "spearman".}
 
 \item{num_clusters}{Number of clusters to form. If NULL, the optimal number
@@ -59,6 +60,8 @@ Default is 2.}
 
 \item{oob}{Logical indicating whether to use out-of-bag samples for density estimation.
 Default is FALSE. Also see \code{forde}}
+
+\item{always_split_meta}{Logical indicating whether to always split on meta features. Default is FALSE.}
 
 \item{family}{Distribution to use for density estimation of continuous features. See \code{forde} for options.}
 

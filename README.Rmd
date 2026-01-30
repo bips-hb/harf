@@ -20,16 +20,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- badges: end -->
 
-## harf: High-Dimensional Adversarial Random Forests
+## harf: High-Dimensional Adversarial Random Forests for Omics Data
 
 ## Introduction
 
-Adversarial random forests (ARFs) have recently been introduced as an extension of classical random forests (RFs) for synthetic data generation. Built on unsupervised RFs, ARFs rely on a recursive adversarial procedure in which trees progressively learn the structural properties of the data through alternating rounds of data generation and discrimination. During the discrimination phase, the objective is to distinguish original observations from synthetic ones obtained via marginal resampling of the original features. This is achieved by introducing a synthetic response variable 
-$y \in \{0,1\}$, where $y = 0$ denotes synthetic data and $y = 1$ denotes original data. The adversarial process stops when the prediction accuracy for $y$ falls below a predefined threshold.
+Adversarial random forests (ARFs) have recently been introduced as data synthetizer. Based on unsupervised RFs, ARFs rely on a recursive adversarial procedure in which trees progressively learn the structural properties of the data through alternating rounds of data generation and discrimination. The unsupervised classificatin task is achieved by introducing a synthetic response variable $y \in \{0,1\}$, where $y = 0$ denotes synthetic data and $y = 1$ denotes original data. During the discrimination phase, the objective is to distinguish original observations from synthetic ones obtained via marginal resampling of the original features in terminal nodes. The adversarial process stops when the prediction accuracy for $y$ falls below a predefined threshold.
 
-While ARFs have demonstrated strong performance in various low-dimensional settings, their behavior in high-dimensional contexts remains uncertain. A key assumption of ARFs — that feature distributions are independent within terminal nodes — may be violated in high-dimensional settings, as a small subset of features can be highly predictive of the synthetic response variable $y$. To address this limitation, the present package implements high-dimensional adversarial random forests (HARFs), which identify isolated regions of the feature space in order to better preserve the independence assumption within terminal nodes.
+While adversarial random forests (ARFs) have demonstrated strong performance in various low-dimensional settings, their behavior in high-dimensional contexts, such as omics data, remains less well understood. A key assumption of ARFs — that feature distributions are independent within terminal nodes — may be violated in high-dimensional settings, where a small subset of features can be highly predictive of the synthetic response variable $y$, while features not used for splitting may remain correlated within terminal nodes.
 
-## Installation
+The high-dimensional adversarial random forests (HARFs) package addresses this limitation by identifying isolated regions of the feature space in which the independence assumption is more likely to hold. In addition to these isolated regions, the HARF procedure constructs a low-dimensional meta-space that captures the relationships among regions. Within each isolated region, separate ARFs are trained to better capture local data structures. To preserve dependencies between regions, meta-features representing region membership are used in the meta-space.
+
+## Package installation
 
 
 ```{r install, include = TRUE, eval = FALSE}

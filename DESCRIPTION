@@ -11,7 +11,7 @@ Description: High-dimensional Adversarial Random Forests (HARF) extend the
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports: 
     arf,
     data.table,
@@ -20,6 +20,9 @@ Imports:
     matrixStats,
     pracma,
     fastPLS,
+    RGCCA,
+    mixOmics,
+    ranger,
     rsvd
 Suggests: 
     testthat (>= 3.0.0),
