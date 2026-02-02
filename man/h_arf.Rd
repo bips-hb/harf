@@ -16,6 +16,7 @@ h_arf(
   num_btwn_pcs = 2,
   num_onset_pcs = 2,
   chunck_size = 10,
+  encode_clin_lab = FALSE,
   oob = FALSE,
   always_split_meta = FALSE,
   family = "truncnorm",
@@ -57,6 +58,8 @@ Usually set to 1 or 2. Default is 2.}
 Default is 2.}
 
 \item{chunck_size}{Size of feature chuncks to process at a time. Default is 10.}
+
+\item{encode_clin_lab}{Logical indicating whether to encode clinical/laboratory data.}
 
 \item{oob}{Logical indicating whether to use out-of-bag samples for density estimation.
 Default is FALSE. Also see \code{forde}}

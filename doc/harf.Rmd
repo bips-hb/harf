@@ -96,9 +96,9 @@ my_cli_lab_data <- data.frame(cell_type = single_cell$cell_type)
 harf_model <- h_arf(
  omx_data = my_omx_data,
  cli_lab_data = my_cli_lab_data,
- target = "cell_type",
+ # target = "cell_type",
  parallel = parallel,
- chunck_size = 4,
+ chunck_size = 8,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)

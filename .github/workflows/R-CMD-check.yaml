@@ -41,6 +41,10 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+        - name: Prepare pak cache
+          run: |
+            mkdir -p ~/.cache/pak
+            mkdir -p ~/.local/share/renv
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:

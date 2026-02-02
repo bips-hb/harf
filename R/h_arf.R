@@ -24,6 +24,7 @@
 #' @param num_onset_pcs Number of principal components to use for onset features.
 #' Default is 2.
 #' @param chunck_size Size of feature chuncks to process at a time. Default is 10.
+#' @param encode_clin_lab Logical indicating whether to encode clinical/laboratory data.
 #' @param oob Logical indicating whether to use out-of-bag samples for density estimation.
 #' Default is FALSE. Also see \code{forde}
 #' @param always_split_meta Logical indicating whether to always split on meta features. Default is FALSE.
@@ -44,6 +45,7 @@
 #' @importFrom rsvd rpca
 #' @importFrom stats cor dist prcomp
 #' @importFrom ranger ranger
+#' @importFrom RFAE encode
 #' @importFrom RGCCA rgcca
 #' @importFrom mixOmics block.spls block.splsda
 #' @export
@@ -90,6 +92,7 @@ h_arf <- function (
     num_btwn_pcs = 2,
     num_onset_pcs = 2,
     chunck_size = 10,
+    encode_clin_lab = FALSE,
     oob = FALSE,
     always_split_meta = FALSE,
     family = "truncnorm",
@@ -222,14 +225,16 @@ h_arf <- function (
   names(meta_features) <- sprintf("cluster_%s",
                                   unique(feature_clusters))
   # Prepare clinical region RFAE of clinical/laboratory data if provided
-  if (!is.null(cli_lab_data) & (ncol(cli_lab_data) > num_btwn_pcs)) {
+  if (!is.null(cli_lab_data) &
+      (ncol(cli_lab_data) > num_btwn_pcs) &
+      isTRUE(encode_clin_lab)) {
     if (isTRUE(verbose)) {
       message("Encoding clinical/laboratory data via RFAE...\n")
     }
     if (is.null(target)) {
       # Unsupervised RFAE
       cli_lab_rfae <- do.call(
-        what = "RFAE::encode",
+        what = "encode",
         args = list(
           rf = arf::adversarial_rf(
             x = cli_lab_data,
@@ -243,17 +248,34 @@ h_arf <- function (
       )
     } else {
       # Supervised RFAE
-      cli_lab_rf <- ranger::ranger(
-        data = cli_lab_data,
-        dependent.variable.name = target,
-        num_trees = num_trees,
-        min_node_size = min_node_size,
-        verbose = verbose
-      )
+      # cli_lab_rf <- ranger::ranger(
+      #   data = cli_lab_data,
+      #   dependent.variable.name = target,
+      #   num.trees = num_trees,
+      #   min.node.size = min_node_size,
+      #   verbose = verbose
+      # )
+      # cli_lab_rfae <- do.call(
+      #   what = "encode",
+      #   args = list(
+      #     rf = cli_lab_rf,
+      #     x = cli_lab_data,
+      #     k = num_btwn_pcs
+      #   )
+      # )
+      # TODO: Only the unsupervised RFAE is currently implemented as RFAE has a
+      # bug with supervised encoding.
+      warning("Supervised RFAE is not currently implemented. Proceeding with unsupervised RFAE.")
+      # Unsupervised RFAE
       cli_lab_rfae <- do.call(
-        what = "RFAE::encode",
+        what = "encode",
         args = list(
-          rf = cli_lab_rf,
+          rf = arf::adversarial_rf(
+            x = cli_lab_data,
+            num_trees = num_trees,
+            min_node_size = min_node_size,
+            verbose = FALSE
+          ),
           x = cli_lab_data,
           k = num_btwn_pcs
         )
@@ -271,7 +293,8 @@ h_arf <- function (
       ncomp = num_btwn_pcs,
       matrix(1, length(meta_features),
              length(meta_features)) - diag(length(meta_features)),
-      scheme = "centroid"
+      scheme = "centroid",
+      tau = "optimal"
     )
     meta_features <- as.data.frame(do.call(cbind, Z$Y))
   } else {

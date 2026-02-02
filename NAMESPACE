@@ -3,6 +3,7 @@
 export(h_arf)
 export(h_forge)
 importFrom(ClusterR,KMeans_rcpp)
+importFrom(RFAE,encode)
 importFrom(RGCCA,rgcca)
 importFrom(fastPLS,fastcor)
 importFrom(matrixStats,colVars)
