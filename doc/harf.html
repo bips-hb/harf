@@ -12,7 +12,7 @@
 
 <meta name="author" content="Cesaire Fouodo" />
 
-<meta name="date" content="2026-01-30" />
+<meta name="date" content="2026-02-25" />
 
 <title>High-Dimensional Adversarial Random Forests for Omics Data</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">High-Dimensional Adversarial Random Forests
 for Omics Data</h1>
 <h4 class="author">Cesaire Fouodo</h4>
-<h4 class="date">2026-01-30</h4>
+<h4 class="date">2026-02-25</h4>
 
 
 <div id="TOC">
@@ -512,17 +512,16 @@ runtime. We generally used the default chunk size of <span class="math inline">\
 <span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 59.45%</span></span>
 <span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a><span class="co">#&gt; Iteration: 2, Accuracy: 48.51%</span></span>
 <span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a><span class="fu">str</span>(harf_model,<span class="at">max.level =</span> <span class="dv">1</span>)</span>
-<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a><span class="co">#&gt; List of 8</span></span>
+<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a><span class="co">#&gt; List of 7</span></span>
 <span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a><span class="co">#&gt;  $ meta_model      :List of 3</span></span>
 <span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a><span class="co">#&gt;  $ models          :List of 17</span></span>
 <span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a><span class="co">#&gt;  $ cluster         :&#39;data.frame&#39;:    100 obs. of  2 variables:</span></span>
 <span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a><span class="co">#&gt;  $ meta_features   :&#39;data.frame&#39;:    2061 obs. of  3 variables:</span></span>
-<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">#&gt;  $ clin_lab_rfae   : NULL</span></span>
-<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a><span class="co">#&gt;  $ omx_features    : chr [1:100] &quot;V1&quot; &quot;V2&quot; &quot;V3&quot; &quot;V4&quot; ...</span></span>
-<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a><span class="co">#&gt;  $ cli_lab_features: chr &quot;cell_type&quot;</span></span>
-<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a><span class="co">#&gt;  $ accuracy        : Named num [1:18] 0.461 0.485 0.463 0.443 0.452 ...</span></span>
-<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:18] &quot;meta_model&quot; &quot;cluster_2&quot; &quot;cluster_3&quot; &quot;cluster_6&quot; ...</span></span>
-<span id="cb4-68"><a href="#cb4-68" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;harf&quot;</span></span></code></pre></div>
+<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">#&gt;  $ omx_features    : chr [1:100] &quot;V1&quot; &quot;V2&quot; &quot;V3&quot; &quot;V4&quot; ...</span></span>
+<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a><span class="co">#&gt;  $ cli_lab_features: chr &quot;cell_type&quot;</span></span>
+<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a><span class="co">#&gt;  $ accuracy        : Named num [1:18] 0.461 0.485 0.463 0.443 0.452 ...</span></span>
+<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:18] &quot;meta_model&quot; &quot;cluster_2&quot; &quot;cluster_3&quot; &quot;cluster_6&quot; ...</span></span>
+<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;harf&quot;</span></span></code></pre></div>
 </div>
 <div id="inspect-accuracy-of-the-harf-model" class="section level2" number="4">
 <h2><span class="header-section-number">4</span> Inspect accuracy of the

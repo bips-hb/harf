@@ -14,11 +14,11 @@ h_arf(
   correlation_method = "spearman",
   num_clusters = NULL,
   num_btwn_pcs = 2,
+  num_folds = 2,
   num_onset_pcs = 2,
   chunck_size = 10,
   encode_clin_lab = FALSE,
   oob = FALSE,
-  always_split_meta = FALSE,
   family = "truncnorm",
   finite_bounds = "no",
   alpha = 0,
@@ -51,8 +51,9 @@ Options include "pearson", "spearman", and "kendall". Default is "spearman".}
 \item{num_clusters}{Number of clusters to form. If NULL, the optimal number
 of clusters is found by finding the elbow method.}
 
-\item{num_btwn_pcs}{Number of principal components to use for between cluster variability.
-Usually set to 1 or 2. Default is 2.}
+\item{num_btwn_pcs}{Number of principal components to use for between cluster variability. Default is 2.}
+
+\item{num_folds}{Number of folds for cross-validation when computing region-aware predictions. Default is 2.}
 
 \item{num_onset_pcs}{Number of principal components to use for onset features.
 Default is 2.}
@@ -63,8 +64,6 @@ Default is 2.}
 
 \item{oob}{Logical indicating whether to use out-of-bag samples for density estimation.
 Default is FALSE. Also see \code{forde}}
-
-\item{always_split_meta}{Logical indicating whether to always split on meta features. Default is FALSE.}
 
 \item{family}{Distribution to use for density estimation of continuous features. See \code{forde} for options.}
 

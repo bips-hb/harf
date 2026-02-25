@@ -19,15 +19,14 @@
 #' Options include "pearson", "spearman", and "kendall". Default is "spearman".
 #' @param num_clusters Number of clusters to form. If NULL, the optimal number
 #' of clusters is found by finding the elbow method.
-#' @param num_btwn_pcs Number of principal components to use for between cluster variability.
-#' Usually set to 1 or 2. Default is 2.
+#' @param num_btwn_pcs Number of principal components to use for between cluster variability. Default is 2.
+#' @param num_folds Number of folds for cross-validation when computing region-aware predictions. Default is 2.
 #' @param num_onset_pcs Number of principal components to use for onset features.
 #' Default is 2.
 #' @param chunck_size Size of feature chuncks to process at a time. Default is 10.
 #' @param encode_clin_lab Logical indicating whether to encode clinical/laboratory data.
 #' @param oob Logical indicating whether to use out-of-bag samples for density estimation.
 #' Default is FALSE. Also see \code{forde}
-#' @param always_split_meta Logical indicating whether to always split on meta features. Default is FALSE.
 #' @param family Distribution to use for density estimation of continuous features. See \code{forde} for options.
 #' @param finite_bounds Impose finite bounds on all continuous variables?
 #' If "local", infinite bounds are set to empirical extrema within leaves.
@@ -45,9 +44,7 @@
 #' @importFrom rsvd rpca
 #' @importFrom stats cor dist prcomp
 #' @importFrom ranger ranger
-#' @importFrom RFAE encode
 #' @importFrom RGCCA rgcca
-#' @importFrom mixOmics block.spls block.splsda
 #' @export
 #' @seealso [h_forge], [arf::adversarial_rf], [arf::forde]
 #' @examples
@@ -90,11 +87,11 @@ h_arf <- function (
     correlation_method = "spearman",
     num_clusters = NULL,
     num_btwn_pcs = 2,
+    num_folds = 2,
     num_onset_pcs = 2,
     chunck_size = 10,
     encode_clin_lab = FALSE,
     oob = FALSE,
-    always_split_meta = FALSE,
     family = "truncnorm",
     finite_bounds = "no",
     alpha = 0,
@@ -224,70 +221,9 @@ h_arf <- function (
   )
   names(meta_features) <- sprintf("cluster_%s",
                                   unique(feature_clusters))
-  # Prepare clinical region RFAE of clinical/laboratory data if provided
-  if (!is.null(cli_lab_data) &
-      (ncol(cli_lab_data) > num_btwn_pcs) &
-      isTRUE(encode_clin_lab)) {
-    if (isTRUE(verbose)) {
-      message("Encoding clinical/laboratory data via RFAE...\n")
-    }
-    if (is.null(target)) {
-      # Unsupervised RFAE
-      cli_lab_rfae <- do.call(
-        what = "encode",
-        args = list(
-          rf = arf::adversarial_rf(
-            x = cli_lab_data,
-            num_trees = num_trees,
-            min_node_size = min_node_size,
-            verbose = FALSE
-          ),
-          x = cli_lab_data,
-          k = num_btwn_pcs
-        )
-      )
-    } else {
-      # Supervised RFAE
-      # cli_lab_rf <- ranger::ranger(
-      #   data = cli_lab_data,
-      #   dependent.variable.name = target,
-      #   num.trees = num_trees,
-      #   min.node.size = min_node_size,
-      #   verbose = verbose
-      # )
-      # cli_lab_rfae <- do.call(
-      #   what = "encode",
-      #   args = list(
-      #     rf = cli_lab_rf,
-      #     x = cli_lab_data,
-      #     k = num_btwn_pcs
-      #   )
-      # )
-      # TODO: Only the unsupervised RFAE is currently implemented as RFAE has a
-      # bug with supervised encoding.
-      warning("Supervised RFAE is not currently implemented. Proceeding with unsupervised RFAE.")
-      # Unsupervised RFAE
-      cli_lab_rfae <- do.call(
-        what = "encode",
-        args = list(
-          rf = arf::adversarial_rf(
-            x = cli_lab_data,
-            num_trees = num_trees,
-            min_node_size = min_node_size,
-            verbose = FALSE
-          ),
-          x = cli_lab_data,
-          k = num_btwn_pcs
-        )
-      )
-    }
-    cli_lab_features <- as.matrix(cli_lab_rfae$Z)
-    meta_features <- c(meta_features,
-                       list(cli_lab = cli_lab_features))
-  }
-  # (Un)supervised CCA on all blocks to get meta features.
+  # CCA on all blocks to get meta features.
   if (is.null(target)) {
-    # Unsupervised RGCCA to capture between-cluster variability
+    # Unsupervised CCA
     Z <- RGCCA::rgcca(
       blocks = meta_features,
       ncomp = num_btwn_pcs,
@@ -296,51 +232,28 @@ h_arf <- function (
       scheme = "centroid",
       tau = "optimal"
     )
-    meta_features <- as.data.frame(do.call(cbind, Z$Y))
+    Z <- do.call(cbind, Z$Y)
+    meta_features <- as.data.frame(Z)
+    # Rename meta features as cluster_i.1 and cluster_i.2 etc.
+    colnames(meta_features) <- sprintf("cluster_%s.%s",
+                                       rep(sort(unique(feature_clusters)),
+                                           each = num_btwn_pcs),
+                                       rep(1:num_btwn_pcs,
+                                           times = length(unique(feature_clusters))))
   } else {
-    if (is.null(cli_lab_data) | !(target %in% colnames(cli_lab_data))) {
-      stop("target must be a column name in cli_lab_data.")
-    }
-    if (is.numeric(cli_lab_data[[target]])) {
-      target_type <- "numeric"
-    } else {
-      target_type <- "categorical"
-    }
-    # Supervised CCA depending on target type
-    if (target_type == "categorical") {
-      splsda_fit <- mixOmics::block.splsda(
-        X = meta_features,
-        Y = cli_lab_data[[target]],
-        ncomp = num_btwn_pcs,
-        keepX = lapply(meta_features,
-                       function(x) {
-                         rep(ncol(x), num_btwn_pcs)
-                       })
-      )
-      meta_features <- as.data.frame(do.call(cbind, splsda_fit$variates))
-    } else {
-      spls_fit <- mixOmics::block.spls(
-        X = meta_features,
-        Y = cli_lab_data[[target]],
-        ncomp = num_btwn_pcs,
-        keepX = lapply(meta_features,
-                       function(x) {
-                         rep(ncol(x), num_btwn_pcs)
-                       }),
-        keepY = rep(ncol(cli_lab_data[[target]]), num_btwn_pcs)
-      )
-      meta_features <- as.data.frame(do.call(cbind, spls_fit$variates))
-    }
+    Z <- supervised_pls(
+      omx_data = omx_data,
+      y = cli_lab_data[[target]],
+      num_btwn_pcs = num_btwn_pcs
+    )
+    meta_features <- as.data.frame(Z)
+    colnames(meta_features) <- sprintf("pls_pc_%s",
+                                       1:num_btwn_pcs)
   }
-  # Rename meta features as cluster_i.1 and cluster_i.2 etc.
-  colnames(meta_features) <- sprintf("cluster_%s.%s",
-                                     rep(sort(unique(feature_clusters)),
-                                         each = num_btwn_pcs),
-                                     rep(1:num_btwn_pcs,
-                                         times = length(unique(feature_clusters))))
+
   row.names(meta_features) <- row.names(omx_data)
   # Dimension reduction of meta features if num_btwn_pcs < ncol(meta_features)
-  if (num_btwn_pcs < ncol(meta_features)) {
+  if ((num_btwn_pcs < ncol(meta_features)) & is.null(target)) {
     pca_meta <- rpca(as.matrix(t(meta_features)),
                      k = num_btwn_pcs,
                      center = TRUE,
@@ -352,6 +265,18 @@ h_arf <- function (
     colnames(meta_features) <- sprintf("meta_pc_%s",
                                        1:num_btwn_pcs)
   }
+  # Add the meta region to the list of regions
+  all_region_list <- c(
+    lapply(
+      unique(feature_clusters),
+      function(cluster) {
+        cluster_data <- omx_data[ , which(feature_clusters == cluster),
+                                  drop = FALSE]
+        return(as.matrix(cluster_data))
+      }
+    ),
+    list(as.matrix(meta_features))
+  )
   # Dimension reduction of omx_onset_data if provided
   onset_loadings <- NULL
   if (!is.null(omx_onset_data)) {
@@ -388,6 +313,11 @@ h_arf <- function (
     x = meta_features,
     num_trees = num_trees,
     min_node_size = min_node_size,
+    always.split.variables = if (!is.null(target)) {
+      target
+    } else {
+      NULL
+    },
     verbose = verbose
   )
   acc["meta_model"] <- meta_arf$acc[length(meta_arf$acc)]
@@ -424,8 +354,8 @@ h_arf <- function (
       x = ftr_data_subset,
       num_trees = num_trees,
       min_node_size = min_node_size,
-      always.split.variables = if (isTRUE(always_split_meta)) {
-        colnames(meta_features)
+      always.split.variables = if (!is.null(target)) {
+        target
       } else {
         NULL
       },
@@ -466,7 +396,7 @@ h_arf <- function (
                    cluster = feature_clusters
                  ),
                  meta_features = meta_features,
-                 clin_lab_rfae = if (exists("cli_lab_rfae")) cli_lab_rfae else NULL,
+                 # clin_lab_rfae = if (exists("cli_lab_rfae")) cli_lab_rfae else NULL,
                  omx_features = cln_omx_data,
                  cli_lab_features = cln_cli_lab_data,
                  accuracy = acc
@@ -474,3 +404,38 @@ h_arf <- function (
   class(hd_arf) <- "harf"
   return(hd_arf)
 }
+
+
+#' Partial Least Squares (PLS) regression for supervised dimension reduction.
+#'
+#' This function performs supervised dimension reduction using PLS regression to
+#' find components that capture the covariance between the omics data and the
+#' target variable. The resulting components can be used as meta features for
+#' the meta adversarial model in \code{h_arf}.
+#'
+#' @param omx_data A data.frames or matrices representing different regions.
+#' @param y A numeric or factor vector representing the target variable.
+#' @param num_btwn_pcs Number of principal components to use for between region variability.
+#'
+#' @returns A matrix of latent supervised scores.
+#' @keywords internal
+#' @importFrom stats model.matrix
+#' @importFrom pls plsr
+#'
+supervised_pls <- function(
+    omx_data,
+    y,
+    num_btwn_pcs = 2
+) {
+  if (is.factor(y)) {
+    y_onehat <- model.matrix(~ y - 1)
+  } else {
+    y_onehat <- y
+  }
+  # Fit PLS regression model
+  pls_model <- pls::plsr(y_onehat ~ as.matrix(omx_data),
+                         ncomp = num_btwn_pcs)
+  Z_sup <- pls::scores(pls_model)[, 1:num_btwn_pcs, drop = FALSE]
+  return(Z_sup)
+}
+

@@ -19,10 +19,9 @@ Imports:
     ClusterR,
     matrixStats,
     pracma,
+    pls,
     fastPLS,
     RGCCA,
-    mixOmics,
-    RFAE,
     ranger,
     rsvd
 Suggests: 
