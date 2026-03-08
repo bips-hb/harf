@@ -144,13 +144,15 @@ h_arf <- function (
   if (!correlation_method %in% c("pearson", "spearman", "kendall")) {
     stop("correlation_method must be one of 'pearson', 'spearman', or 'kendall'.")
   }
-  if (nrow(correlation_mat) != ncol(omx_data) | ncol(correlation_mat) != ncol(omx_data)) {
-    stop("correlation_mat must be a square matrix with dimensions equal to the number of features in omx_data.")
+  if (!is.null(correlation_mat)) {
+    if (nrow(correlation_mat) != ncol(omx_data) | ncol(correlation_mat) != ncol(omx_data)) {
+      stop("correlation_mat must be a square matrix with dimensions equal to the number of features in omx_data.")
+    }
   }
   if (!is.numeric(chunck_size) | chunck_size <= 0 | chunck_size != round(chunck_size)) {
     stop("chunck_size must be a positive integer.")
   }
-  if (!logical(verbose)) {
+  if (!is.logical(verbose)) {
     stop("verbose must be a logical value (TRUE or FALSE).")
   }
   if (!is.logical(parallel)) {
