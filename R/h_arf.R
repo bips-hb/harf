@@ -17,6 +17,7 @@
 #' @param min_node_size Minimum number of samples required to split an internal node in the ARF model.
 #' @param correlation_method Methods to compute correlation between features.
 #' Options include "pearson", "spearman", and "kendall". Default is "spearman".
+#' @param correlation_mat Optional pre-computed correlation matrix between features. If provided, this will be used instead of computing correlations from \code{omx_data}. This can be usefull for tuning hyperparameters of the clustering step without having to recompute the correlation matrix each time.
 #' @param num_clusters Number of clusters to form. If NULL, the optimal number
 #' of clusters is found by finding the elbow method.
 #' @param num_btwn_pcs Number of principal components to use for between cluster variability. Default is 2.
@@ -35,6 +36,7 @@
 #' @param alpha Optional pseudocount for Laplace smoothing in density estimation. See \code{forde} for more details.
 #' @param epsilon Optional slack parameter on empirical bounds. See \code{forde} for more details.
 #' @param parallel Logical indicating whether to use parallel processing. Default is TRUE.
+#' @param export_cor_mat Logical indicating whether to export the correlation matrix used for clustering. Default is FALSE.
 #' @param verbose Logical indicating whether to print progress messages. Default is FALSE.
 #'
 #' @returns An isoARF object containing the fitted adversarial models, and clustering
@@ -83,8 +85,8 @@ h_arf <- function (
     omx_onset_data = NULL,
     num_trees = 10,
     min_node_size = 5,
-    # encoder = "fastcor",
     correlation_method = "spearman",
+    correlation_mat = NULL,
     num_clusters = NULL,
     num_btwn_pcs = 2,
     num_folds = 2,
@@ -97,6 +99,7 @@ h_arf <- function (
     alpha = 0,
     epsilon = 0.0,
     parallel = TRUE,
+    export_cor_mat = FALSE,
     verbose = FALSE
 ) {
   # Stop if omx_data is not a data.frame or data.table
@@ -141,18 +144,34 @@ h_arf <- function (
   if (!correlation_method %in% c("pearson", "spearman", "kendall")) {
     stop("correlation_method must be one of 'pearson', 'spearman', or 'kendall'.")
   }
+  if (nrow(correlation_mat) != ncol(omx_data) | ncol(correlation_mat) != ncol(omx_data)) {
+    stop("correlation_mat must be a square matrix with dimensions equal to the number of features in omx_data.")
+  }
   if (!is.numeric(chunck_size) | chunck_size <= 0 | chunck_size != round(chunck_size)) {
     stop("chunck_size must be a positive integer.")
+  }
+  if (!logical(verbose)) {
+    stop("verbose must be a logical value (TRUE or FALSE).")
+  }
+  if (!is.logical(parallel)) {
+    stop("parallel must be a logical value (TRUE or FALSE).")
+  }
+  if (!is.logical(export_cor_mat)) {
+    stop("export_cor_mat must be a logical value (TRUE or FALSE).")
   }
   if (isTRUE(verbose)) {
     message("Clustering features...\n")
   }
   # Encoding via fast correlation and PCA
-  if (correlation_method == "spearman") {
+  if ((correlation_method == "spearman") & is.null(correlation_mat)) {
     cor_matrix <- fastcor(t(as.matrix(omx_data)))
-  } else {
+  }
+  if ((correlation_method %in% c("pearson", "kendall")) & is.null(correlation_mat)) {
     # TODO: Optmize me by using a fast correlation function that supports pearson and kendall
     cor_matrix <- cor(as.matrix(omx_data), method = correlation_method)
+  }
+  if (!is.null(correlation_mat)) {
+    cor_matrix <- correlation_mat
   }
   # PCA with encoded data
   projected_data <- fast.pca(
@@ -390,6 +409,7 @@ h_arf <- function (
   }
   # Export feature_cluster_df and meta to arf_models as well.
   hd_arf <- list(meta_model = meta_model,
+                 cor_matrix = if (isTRUE(export_cor_mat)) cor_matrix else NULL,
                  models = arf_models,
                  cluster = data.frame(
                    feature = colnames(omx_data),
