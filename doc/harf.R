@@ -46,7 +46,7 @@ harf_model <- h_arf(
  cli_lab_data = my_cli_lab_data,
  # target = "cell_type",
  parallel = parallel,
- chunck_size = 8,
+ chunck_size = 5,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
