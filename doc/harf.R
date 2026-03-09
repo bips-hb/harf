@@ -1,7 +1,9 @@
 ## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  dev = "png",
+  type = "cairo"
 )
 
 ## ----install_libraries, warning = FALSE, message = FALSE, eval = FALSE--------
