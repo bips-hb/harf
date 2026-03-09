@@ -131,9 +131,10 @@ acc_plot
 The `h_forge` function generates synthetic data from a trained HARF model. Here, we generate the same number of synthetic samples as in the original dataset, and without any evidence (i.e., unconditional generation).
 
 ```{r harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
+set.seed(321)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
-  n_synth = nrow(single_cell), 
+  n_synth = 2*nrow(single_cell), 
   evidence = NULL,
   parallel = parallel,
   verbose = FALSE
@@ -152,7 +153,7 @@ setorder(cluster_feature, cluster)
 orig_clustered <- single_cell[ , c("cell_type", cluster_feature$feature)]
 synth_clustered <- as.data.frame(synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
 plot_corr <- function(dt, title) {
-  corr_matrix <- cor(dt[ , 2:51], method = "spearman")
+  corr_matrix <- cor(dt[ , 2:21], method = "spearman")
   corrplot(corr_matrix,
            method = "circle",
            tl.col = "black",
