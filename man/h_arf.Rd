@@ -12,6 +12,7 @@ h_arf(
   num_trees = 10,
   min_node_size = 5,
   correlation_method = "spearman",
+  correlation_mat = NULL,
   num_clusters = NULL,
   num_btwn_pcs = 2,
   num_folds = 2,
@@ -24,6 +25,7 @@ h_arf(
   alpha = 0,
   epsilon = 0,
   parallel = TRUE,
+  export_cor_mat = FALSE,
   verbose = FALSE
 )
 }
@@ -47,6 +49,8 @@ dimension reduction. If NULL, unsupervised dimension reduction is performed.}
 
 \item{correlation_method}{Methods to compute correlation between features.
 Options include "pearson", "spearman", and "kendall". Default is "spearman".}
+
+\item{correlation_mat}{Optional pre-computed correlation matrix between features. If provided, this will be used instead of computing correlations from \code{omx_data}. This can be usefull for tuning hyperparameters of the clustering step without having to recompute the correlation matrix each time.}
 
 \item{num_clusters}{Number of clusters to form. If NULL, the optimal number
 of clusters is found by finding the elbow method.}
@@ -77,6 +81,8 @@ If "global", infinite bounds are set to global empirical extrema. if "no"
 \item{epsilon}{Optional slack parameter on empirical bounds. See \code{forde} for more details.}
 
 \item{parallel}{Logical indicating whether to use parallel processing. Default is TRUE.}
+
+\item{export_cor_mat}{Logical indicating whether to export the correlation matrix used for clustering. Default is FALSE.}
 
 \item{verbose}{Logical indicating whether to print progress messages. Default is FALSE.}
 }
