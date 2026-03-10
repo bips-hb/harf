@@ -339,7 +339,8 @@ h_arf <- function (
     } else {
       NULL
     },
-    verbose = verbose
+    verbose = verbose,
+    parallel = parallel
   )
   acc["meta_model"] <- meta_arf$acc[length(meta_arf$acc)]
   # Density estimation for meta model
@@ -380,7 +381,8 @@ h_arf <- function (
       } else {
         NULL
       },
-      verbose = verbose
+      verbose = verbose,
+      parallel = parallel
     )
     # Density estimation
     iso_forde <- arf::forde(

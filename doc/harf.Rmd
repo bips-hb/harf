@@ -1,5 +1,5 @@
 ---
-title: "High-Dimensional Adversarial Random Forests for Omics Data"
+title: "How does HARH work?"
 author: "Cesaire Fouodo"
 date: "`r Sys.Date()`"
 output:
@@ -8,7 +8,7 @@ output:
     toc_depth: 3         # include headers up to ###
     number_sections: true  # automatically number sections
 vignette: >
-  %\VignetteIndexEntry{High-Dimensional Adversarial Random Forests for Omics Data}
+  %\VignetteIndexEntry{How does HARH work?}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

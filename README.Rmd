@@ -34,7 +34,7 @@ The high-dimensional adversarial random forests (HARFs) package addresses the co
 
 
 ```{r install, include = TRUE, eval = FALSE}
-devtools::install_github("bips-hp/harf")
+devtools::install_github("bips-hb/harf", build_vignettes  = TRUE)
 ```
 
 ```{r example, include = TRUE, eval = FALSE}
