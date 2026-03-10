@@ -28,7 +28,7 @@ test_that("Adversarial game for clustering works crrectly", {
 })
 
 
-test_that("Adversarial game for prediction works crrectly", {
+test_that("Adversarial game for prediction works correctly", {
   iris_data <- datasets::iris
   expect_silent({
     harf_prd_obj <- h_arf(omx_data = iris_data[ , -5],
@@ -43,6 +43,7 @@ test_that("Adversarial game for prediction works crrectly", {
     harf_obj = harf_prd_obj,
     n_synth = 150,
     evidence = NULL,
+    verbose = FALSE,
     parallel = FALSE
   )
   expect_true(is.data.frame(synth_iris))
