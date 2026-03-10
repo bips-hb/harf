@@ -108,7 +108,7 @@ h_arf <- function (
   } else {
     omx_data <- as.data.frame(omx_data)
   }
-  cln_omx_data <- colnames(omx_data)
+  omx_features <- colnames(omx_data)
   if (!is.null(omx_onset_data)) {
     if (!is.data.frame(omx_onset_data)) {
       stop("omx_onset_data must be a data.frame.")
@@ -419,7 +419,7 @@ h_arf <- function (
                  ),
                  meta_features = meta_features,
                  # clin_lab_rfae = if (exists("cli_lab_rfae")) cli_lab_rfae else NULL,
-                 omx_features = cln_omx_data,
+                 omx_features = omx_features,
                  cli_lab_features = cln_cli_lab_data,
                  accuracy = acc
   )

@@ -35,11 +35,14 @@ Suggests:
     scater,
     cowplot,
     ggplot2,
-    doParallel
+    doParallel,
+    pROC,
+    caret
 Config/testthat/edition: 3
 Depends: R (>= 3.6.0)
 Collate: 
   'single_cell.R'
+  'kich.R'
   'utils.R'
   'h_arf.R'
   'h_forge.R'

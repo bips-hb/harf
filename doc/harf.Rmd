@@ -33,16 +33,16 @@ pre[class] {
 }
 ```
 
-## Introduction
+# Introduction
 
-The R package **harf** is an extension of the adversarial random forests (ARFs) 
-to high-dimensional data. This vignette serves as a user guide to use the package effectively. Two key functionalities are provided: `h_arf` to train and estimate densities in a high-dimensional adversarial random forest (HARF), and `h_forge` for the synthetic data generating process. The `h_forge` function  allows for conditional data generation as well.
+The R package **harf** extends adversarial random forests (ARFs) 
+to high-dimensional data. This vignette serves as a user guide to use the package effectively. Two key functionalities are provided: `h_arf` to train and estimate densities in a high-dimensional adversarial random forest (HARF), and `h_forge` for the synthetic data generating process. Unconditional and conditional data generating processes are supported. The package is designed to handle high-dimensional omics data, such as gene expression measurements, and can be applied to various downstream analyses, including clustering (unsupervised) and classification to generate synthetic data (supervised). For clustering, we illustrate the usage of the **harf** package using a single-cell RNA-seq dataset, where the goal is to generate synthetic data that preserves the underlying structure of the original data. For prediction, illustration is made based on gene expression data, with the goal to synthesize gene expression data that can be used to assess the performance of a prediction models in the absence of original datasets. Such a situation typically arise when research face sample size limitation and do not have enough of data to built and evaluate their prediction model.
 
-## Libraries and data
+# Unsupervised data generating process
 
-The package single cell built-in dataset `single_cell` used in this vignette are included in the *harf* package and originate from The Cancer Genome Atlas (TCGA) and the Genotype-Tissue Expression (GTEx) projects, two large-scale public resources providing extensive RNA-seq data. The data were extracted from previously processed and curated datasets generated using the pipeline described in Aguet et al. (2017). This pipeline ensures log-transformed gene measurements, expressed in at least $6\%$ of cells. To keep the computational burden manageable for this vignette, we randomly selected $100$ genes and $2061$ from the original dataset. The included cells are grouped by human organes, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
+The package single cell built-in dataset `single_cell` used in this vignette originate from The Cancer Genome Atlas (TCGA) and the Genotype-Tissue Expression (GTEx) projects, two large-scale public resources providing extensive RNA-seq data. The data were extracted from previously processed and curated datasets generated using the pipeline described in Aguet et al. (2017). This pipeline ensures log-transformed gene measurements, expressed in at least $6\%$ of cells. To keep the computational burden manageable for this vignette, we randomly selected $80$ genes and $1652$ from the original dataset. The included cells are grouped by human organes, including bladder, breast, cervix, colon, esophagus (gastroesophageal junction, mucosa, muscularis), kidney, liver, lung, prostate, salivary gland, stomach, thyroid, and uterus. The variable `cell_type` indicates the tissue of origin for each cell.
 
-We start by installing the required packages if you have not already done so.
+The following code requires some packages to be installed.
 
 ```{r install_libraries, warning = FALSE, message = FALSE, eval = FALSE}
 install.packages("data.table")
@@ -58,7 +58,7 @@ install.packages("corrplot")
 install.packages("doParallel")
 ```
 
-We load the libraries.
+We load the required libraries.
 
 ```{r load_libraries, warning = FALSE, message = FALSE}
 library(harf)
@@ -77,20 +77,17 @@ registerDoParallel(cores = 2)
 set.seed(123, "L'Ecuyer-CMRG")
 ```
 
-In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The HARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be mixed (categorical or numeric). In the following example, gene expression measurements are used as the omics data, while cell type serves as the clinical or phenotypic variable.
+In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The HARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be mixed (categorical or numeric). In the following example, gene expression measurements are used as the omics data, while cell type serves as the labor information. Our first aim is to train a generative model to generate synthetic data that preserves the underlying structure of the original data, including the correlation structure between features and the cluster structure of cells.
 
-We load the single_cell dataset and disable parallelization when the code is 
-executed in a `CRAN` environment, in accordance with `CRAN` policies.
-
-```{r data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r single_cell_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 data("single_cell")
-# Do not parellelize on CRAN
-parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
+chunk_size <- 5
 ```
 
-## High-dimensional adversarial game
+We set the chunk size size to `r chunk_size` for illustration, but in practice, users may need to tune this parameter to achieve a predefined level, for a given performance measure.
 
-We train a HARF model using the `h_arf` function. The gene expression measurements are provided as the `omx_data` argument, while the cell type information is passed as the `cli_lab_data` argument. We set the maximal chunk size to $5$, to specify that maximal number of features allowed in an isolated region. This parameter is crucial for three main aspects, including (i) controlling the convergence of ARF in the isolated regions, (ii) learning the original correlation pattern between features instead of using meta-feature, and (iii) managing the runtime. We generally used the default chunk size of $10$ for our paper.
+## High-dimensional adversarial game
+We train a HARF model using the `h_arf` function. The gene expression measurements are provided as the `omx_data` argument, while the cell type information is passed as the `cli_lab_data` argument. We set the maximal chunk size to `r chunk_size`, to specify that maximal number of features allowed in an isolated region. This parameter is crucial for three main aspects, including (i) controlling the convergence of ARF in the isolated regions, (ii) learning the joint pattern between features, and (iii) managing the runtime.
 
 ```{r harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE}
 my_omx_data <- single_cell[ , - which(colnames(single_cell)  == "cell_type")]
@@ -98,16 +95,15 @@ my_cli_lab_data <- data.frame(cell_type = single_cell$cell_type)
 harf_model <- h_arf(
  omx_data = my_omx_data,
  cli_lab_data = my_cli_lab_data,
- # target = "cell_type",
- parallel = parallel,
- chunck_size = 4,
+ parallel = FALSE,
+ chunck_size = chunk_size,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
 ```
 
 ## Inspect accuracy of the HARF model
-We plot the accuracy of the HARF model across the training regions and the meta region to ensure that the adversarial game has converged properly. An accuracy close to $0.5$ indicates that the ARF model cannot distinguish between original and synthetic data, suggesting successful convergence. In contrast, an accuracy significantly higher than $0.5$ may indicate that the ARF has not fully captured the data distribution, potentially leading to suboptimal chunk size.
+We plot the accuracy of the HARF model across the training regions and the meta region to ensure that the adversarial game has converged properly. An accuracy lesser than $0.5$ indicates that the ARF model locally converged, i.e. it stopped because it had not been able to distinguish between original and synthetic data. In contrast, an accuracy larger than $0.5$ indicates that the ARF did not locally converge. We recommend to set the chunk size parameter such that the local ARF model converge.
 
 ```{r harf_accuracy, include = TRUE, eval = TRUE, message=FALSE, fig.width = 7, fig.height = 3}
 acc_df <- data.frame(
@@ -127,23 +123,22 @@ acc_plot
 ```
 
 ## Generating synthetic data
-
-The `h_forge` function generates synthetic data from a trained HARF model. Here, we generate the same number of synthetic samples as in the original dataset, and without any evidence (i.e., unconditional generation).
+We use the `h_forge` function to generate sznthsize single cell data using the trained HARF model. Here, we generate the same number of synthetic samples as in the original dataset, and without any evidence, i.e. without any prio information regarding the the single cell classes (`evidence = NULL`). As we will see later, the `evidence` argument can be used to generate synthetic data conditionally on a specific cell types. The generated synthetic data are stored in the `synth_single_cell` object.
 
 ```{r harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
+set.seed(321)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell), 
   evidence = NULL,
-  parallel = parallel,
+  parallel = FALSE,
   verbose = FALSE
   )
 ```
 
 ## Comparaison of correlation matrices
 
-We visually compare the correlation matrices of the original data and the synthetic data. To enhance interpretability, we rearrange the features 
-according to their region assignments obtained from the HARF model. The correlation plots exhibit similar patterns across the three datasets, indicating that the HARF model effectively preserve the origin feature correlation structure.
+We visually compare the correlation matrices of the original data and the synthetic data. To enhance interpretability, we rearrange the features according to their region assignments obtained from the HARF model. The correlation plots exhibit similar patterns across the three datasets, indicating that the HARF model effectively preserve the origin feature correlation structure.
 
 ```{r harf_correlation_matrices, include = TRUE, eval = TRUE, message = FALSE, fig.width = 3.5, fig.height = 3}
 # Re-arrange data by grouping gene by clusters
@@ -152,7 +147,7 @@ setorder(cluster_feature, cluster)
 orig_clustered <- single_cell[ , c("cell_type", cluster_feature$feature)]
 synth_clustered <- as.data.frame(synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
 plot_corr <- function(dt, title) {
-  corr_matrix <- cor(dt[ , 2:51], method = "spearman")
+  corr_matrix <- cor(dt[ , 2:21], method = "spearman")
   corrplot(corr_matrix,
            method = "circle",
            tl.col = "black",
@@ -222,7 +217,7 @@ plot_grid(
 
 ## Conditional resampling
 
-For conditional data generation, we generate synthetic samples for each organ separately. The generated samples are then combined to form the final synthetic dataset. 
+The `evidence` parameter is required for conditional resampling. We generate synthetic samples for each cell typ separately. The generated samples are then combined to form the final synthetic dataset. For these example, we synthesize lung, liver and esophagus mucosa cell types. Both the correlation structure and the cluster structure are well preserved in the conditionally generated synthetic data.
 
 ```{r harf_conditional_expectation, include = TRUE, eval = TRUE, message=FALSE, fig.width = 7, fig.height = 3.5}
 sub_cell_type <- c("lung", "liver", "esophagus_muc")
@@ -232,7 +227,7 @@ single_cell_list <- lapply(sub_cell_type, function (ct) {
         n_synth = sum(single_cell$cell_type == ct),
         evidence = data.frame(cell_type = ct),
         verbose = FALSE,
-        parallel = parallel
+        parallel = FALSE
       )
   return(ct_synth)
 })
@@ -265,11 +260,102 @@ par(mfrow = c(1, 1))
 
 Again, both the correlation structure and the cluster structure are well preserved in the conditionally generated synthetic data.
 
+# Supervised data generating process
+The goal is to generate synthetic gene expression data that can be used to evaluate the performance of a prediction model in the absence of original testing datasets, in a situation in which researchers may not have enough samples for eventual internal validation such as corss-validation. As supervised downstream analysis example, we consider the Cancer Genome Atlas Kidney Chromophobe Collection (TCGA-KICH) gene expression predictors, with artificial tumor stage as binary response variable, since the provided original tumor stages were difficult to predict. The dataset contains $66$ samples and the top $140$ gene expression with the highest empirical variances. We include age and gender as additional clinical variables. To create the response variable, we fix age and the first $10$ gene expression variables to drive an effect. We set the effect of age to $0.5$, and draw the effects of gene expressions uniformly from interval $[-1, 1]$. Subsequently, we train a HARF model using the `h_arf` function on the training data, where the gene expression measurements are provided as the `omx_data` argument, and the binary outcome variable and addition variables including age and gender ($27$ males and $39$ females) are passed as the `cli_lab_data` argument. We also specify the target variable using the parameter `target`. We set the maximal chunk size to $10$, to specify the maximal number of features allowed in an isolated region. After training the HARF model, we use the `h_forge` function to generate synthetic training dataset. We then train a prediction model, on the original and the synthetic training data and evaluate their performances a common testing data. We report the area Receiver Operating Characteristic (ROC) curve (AUC) as performance metric. We expect that the prediction model trained on the synthetic data will have a similar performance to the one trained on the original data, indicating that the HARF model effectively captures the underlying structure of the original data and can be used to generate realistic synthetic datasets for prediction tasks.
+
+We set up the required libraries.
+```{r load_libraries_supervised, warning = FALSE, message = FALSE}
+library(data.table)
+library(pROC) # If not installed, use install.packages("pROC") to install it.
+library(caret) # If not installed, use install.packages("caret") to install it.
+library(ranger) # If not installed, use install.packages("ranger") to install it.
+seed <- 123
+```
+
+We load the `kich` dataset and create training and testing indices.
+
+```{r kich_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+data("kich")
+set.seed(seed)
+train_idx <- caret::createDataPartition(
+  kich$tumor_stage,
+  p = 0.7,
+  list = FALSE
+)
+train_idx <- train_idx[ , "Resample1"]
+```
+
+We use the `ranger` package to train a random forest model on the original training data and evaluate its performance on the testing data.
+
+## Prediction model trained on the original data
+```{r kich_rf, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE}
+set.seed(seed)
+rf_model <- ranger(tumor_stage ~ .,
+                   data = kich[train_idx, ],
+                   num.trees = 500,
+                   probability = FALSE)
+# Estimate AUC on the test set
+test_pred <- predict(rf_model, data = kich[-train_idx, ])$predictions
+test_labels <- kich$tumor_stage[-train_idx]
+auc_original <- roc(test_labels, as.numeric(test_pred))$auc
+print(paste("AUC:", auc_original))
+```
+
+## Supervised adversarial game
+We train a HARF model using the `h_arf` function on the training data, where the gene expression measurements are provided as the `omx_data` argument, and the binary outcome variable and addition variables including age and gender are passed as the `cli_lab_data` argument.
+
+```{r kich_harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE}
+set.seed(seed)
+kich_harf <- h_arf(
+  omx_data = kich[train_idx , !(colnames(kich) %in% c("tumor_stage",
+                                                      "age", "gender"))],
+                   cli_lab_data = kich[train_idx, c("tumor_stage", "age", "gender")],
+                   chunck_size = 10,
+                   target = "tumor_stage",
+                   verbose = TRUE
+  )
+```
+
+## Generating synthetic data
+We now use the `h_forge` function to generate synthetic training dataset.
+
+```{r kich_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
+# Synthetic data
+set.seed(seed)
+synth_kich <- h_forge(
+  harf_obj = kich_harf,
+  n_synth = length(train_idx),
+  evidence = NULL,
+  parallel = FALSE
+)
+synth_kich <- as.data.frame(synth_kich)
+```
+
+## Prediction model trained on the synthetic data
+We train a prediction model on the synthetic training data and evaluate its performance on the testing data, the same testing data used to evaluate the model trained on the original data.
+
+```{r kich_rf_synth, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE}
+set.seed(seed)
+rf_model_synth <- ranger(tumor_stage ~ .,
+                          data = synth_kich,
+                          num.trees = 500,
+                          probability = FALSE)
+# Estimate AUC on the test set
+test_pred_synth <- predict(rf_model_synth, data = kich[-train_idx, ])$predictions
+auc_synth <- roc(test_labels, as.numeric(test_pred_synth))$auc
+auc_comparison <- data.frame(
+  Model = c("Original", "Synthetic"),
+  AUC = c(auc_original, auc_synth)
+)
+print(auc_comparison)
+```
+
+As expected, the prediction model trained on the synthetic data has a similar performance to the one trained on the original data, indicating that the synthetic datasets can be used for prediction tasks. Our illustration simulated a single run, but in practice, users may want to repeat the process multiple times to assess the variability of the results. As in the unsupervised case, users may also want to tune the chunk size parameter in the adversarial game to achieve a predefined level of performance.
+
+
 ## Conclusion
 
-We introduced the R package **harf**, which enables the generation of high-dimensional synthetic data. The package extends the adversarial random forest framework to effectively handle high-dimensional omics data and supports both unconditional and conditional data generation. Although the presented example is based on single-cell RNA-seq data clustering, the usage is strongly similar for classification purposes. We refer to our paper for more details.
-
-Feature clustering is a crucial step in the HARF procedure, as it defines isolated regions where separate ARFs are trained. The choice of chunk size, which determines the maximum number of features allowed in each isolated region, may considerably impacts the performance of the HARF model. A small chunk size leads to more isolated regions with fewer features, guarantees good ARF convergence rate, but imposes the stronger impact of more meta-features to capture dependencies between regions and longer computation time. In contrary, a large chunk size results in fewer regions with more features per region, allows for learning the original feature correlation pattern by minimizing the impact of meta-features, and can speed up the runtime. However, large chnk size may negatively impact the ARF convergence behavior. Finally, The choice of chunk size should consider the trade-off between capturing isolated data structures and maintaining sufficient data within each region for effective training. 
+We introduced the R package **harf** to synthesize high-dimensional data. The package extends the adversarial random forest framework to effectively handle high-dimensional omics data and supports both unconditional and conditional data generation. We have illustrated the usage of the package in both unsupervised and supervised downstream analysis contexts. In the unsupervised context, we demonstrated that the HARF model can effectively capture the underlying structure of the original data, including the correlation structure between features and the cluster structure of cells. In the supervised context, we showed that synthetic datasets generated by the HARF model can be used to train prediction models that achieve similar performance to those trained on original data. Therefore, offering a powerful tool for generating realistic synthetic datasets to improve prediction performance in case of lack of training datasets.
 
 ## References
 

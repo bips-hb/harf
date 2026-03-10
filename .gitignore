@@ -52,3 +52,6 @@ rsconnect/
 /docs/
 /Meta/
 /bin/
+
+# File to prepare data for illustration in prediction dowstream analysis
+/preddata/

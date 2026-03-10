@@ -35,10 +35,9 @@ registerDoParallel(cores = 2)
 # Set seed
 set.seed(123, "L'Ecuyer-CMRG")
 
-## ----data_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
+## ----single_cell_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE----
 data("single_cell")
-# Do not parellelize on CRAN
-parallel <- ifelse(Sys.getenv("NOT_CRAN") == "true", FALSE, FALSE)
+chunk_size <- 5
 
 ## ----harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE----
 my_omx_data <- single_cell[ , - which(colnames(single_cell)  == "cell_type")]
@@ -46,9 +45,8 @@ my_cli_lab_data <- data.frame(cell_type = single_cell$cell_type)
 harf_model <- h_arf(
  omx_data = my_omx_data,
  cli_lab_data = my_cli_lab_data,
- # target = "cell_type",
- parallel = parallel,
- chunck_size = 4,
+ parallel = FALSE,
+ chunck_size = chunk_size,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
@@ -70,11 +68,12 @@ acc_plot <- ggplot2::ggplot(acc_df, ggplot2::aes(x = Region, y = Accuracy)) +
 acc_plot
 
 ## ----harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
+set.seed(321)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell), 
   evidence = NULL,
-  parallel = parallel,
+  parallel = FALSE,
   verbose = FALSE
   )
 
@@ -85,7 +84,7 @@ setorder(cluster_feature, cluster)
 orig_clustered <- single_cell[ , c("cell_type", cluster_feature$feature)]
 synth_clustered <- as.data.frame(synth_single_cell)[ , c("cell_type", cluster_feature$feature)]
 plot_corr <- function(dt, title) {
-  corr_matrix <- cor(dt[ , 2:51], method = "spearman")
+  corr_matrix <- cor(dt[ , 2:21], method = "spearman")
   corrplot(corr_matrix,
            method = "circle",
            tl.col = "black",
@@ -154,7 +153,7 @@ single_cell_list <- lapply(sub_cell_type, function (ct) {
         n_synth = sum(single_cell$cell_type == ct),
         evidence = data.frame(cell_type = ct),
         verbose = FALSE,
-        parallel = parallel
+        parallel = FALSE
       )
   return(ct_synth)
 })
@@ -183,4 +182,70 @@ plot_corr(cond_synth_clustered, "Synthetic")
 par(mfrow = c(1, 1))
 plot_grid(sub_all_plots, sub_legend, ncol = 1, rel_heights = c(1, 0.2))
 par(mfrow = c(1, 1))
+
+## ----load_libraries_supervised, warning = FALSE, message = FALSE--------------
+library(data.table)
+library(pROC) # If not installed, use install.packages("pROC") to install it.
+library(caret) # If not installed, use install.packages("caret") to install it.
+library(ranger) # If not installed, use install.packages("ranger") to install it.
+seed <- 123
+
+## ----kich_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
+data("kich")
+set.seed(seed)
+train_idx <- caret::createDataPartition(
+  kich$tumor_stage,
+  p = 0.7,
+  list = FALSE
+)
+train_idx <- train_idx[ , "Resample1"]
+
+## ----kich_rf, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE-----
+set.seed(seed)
+rf_model <- ranger(tumor_stage ~ .,
+                   data = kich[train_idx, ],
+                   num.trees = 500,
+                   probability = FALSE)
+# Estimate AUC on the test set
+test_pred <- predict(rf_model, data = kich[-train_idx, ])$predictions
+test_labels <- kich$tumor_stage[-train_idx]
+auc_original <- roc(test_labels, as.numeric(test_pred))$auc
+print(paste("AUC:", auc_original))
+
+## ----kich_harf_training, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE----
+set.seed(seed)
+kich_harf <- h_arf(
+  omx_data = kich[train_idx , !(colnames(kich) %in% c("tumor_stage",
+                                                      "age", "gender"))],
+                   cli_lab_data = kich[train_idx, c("tumor_stage", "age", "gender")],
+                   chunck_size = 10,
+                   target = "tumor_stage",
+                   verbose = TRUE
+  )
+
+## ----kich_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
+# Synthetic data
+set.seed(seed)
+synth_kich <- h_forge(
+  harf_obj = kich_harf,
+  n_synth = length(train_idx),
+  evidence = NULL,
+  parallel = FALSE
+)
+synth_kich <- as.data.frame(synth_kich)
+
+## ----kich_rf_synth, include = TRUE, eval = TRUE, message=FALSE, warning = FALSE----
+set.seed(seed)
+rf_model_synth <- ranger(tumor_stage ~ .,
+                          data = synth_kich,
+                          num.trees = 500,
+                          probability = FALSE)
+# Estimate AUC on the test set
+test_pred_synth <- predict(rf_model_synth, data = kich[-train_idx, ])$predictions
+auc_synth <- roc(test_labels, as.numeric(test_pred_synth))$auc
+auc_comparison <- data.frame(
+  Model = c("Original", "Synthetic"),
+  AUC = c(auc_original, auc_synth)
+)
+print(auc_comparison)
 
