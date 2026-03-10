@@ -41,6 +41,12 @@ devtools::install_github("bips-hb/harf", build_vignettes  = TRUE)
 vignette("harf")
 ```
 
+Vignette on browser
+
+```{r vignetteb, include = TRUE, eval = FALSE}
+browseVignettes("harf")
+```
+
 ## References
 
 - Fouodo, C. J. K., Kapar, J. & Wright, M. N. (2026). High-dimensional adversarial random forests. Submission. Link [don't click](https://arxiv.org/abs/2405.12345).

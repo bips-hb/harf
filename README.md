@@ -63,6 +63,12 @@ devtools::install_github("bips-hb/harf", build_vignettes  = TRUE)
 vignette("harf")
 ```
 
+Vignette on browser
+
+``` r
+browseVignettes("harf")
+```
+
 ## References
 
 - Fouodo, C. J. K., Kapar, J. & Wright, M. N. (2026). High-dimensional
