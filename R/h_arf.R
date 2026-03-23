@@ -12,6 +12,7 @@
 #' or additional clinical patient information (e.g. disease status).
 #' @param target Optional name of the target variable in \code{cli_lab_data} for supervised
 #' dimension reduction. If NULL, unsupervised dimension reduction is performed.
+#' @param feature_ordering Optional vector of feature names specifying the order of features in the synthesized data. If NULL, features are ordered according to their original order in \code{omx_data}, followed by order in \code{clin_lab_data}.
 #' @param omx_onset_data Optional data.frame of conditional onset omics features.
 #' @param num_trees Number of trees to grow in each Adversarial Random Forest (ARF) model.
 #' @param min_node_size Minimum number of samples required to split an internal node in the ARF model.
@@ -21,11 +22,9 @@
 #' @param num_clusters Number of clusters to form. If NULL, the optimal number
 #' of clusters is found by finding the elbow method.
 #' @param num_btwn_pcs Number of principal components to use for between cluster variability. Default is 2.
-#' @param num_folds Number of folds for cross-validation when computing region-aware predictions. Default is 2.
 #' @param num_onset_pcs Number of principal components to use for onset features.
 #' Default is 2.
 #' @param chunck_size Size of feature chuncks to process at a time. Default is 10.
-#' @param encode_clin_lab Logical indicating whether to encode clinical/laboratory data.
 #' @param oob Logical indicating whether to use out-of-bag samples for density estimation.
 #' Default is FALSE. Also see \code{forde}
 #' @param family Distribution to use for density estimation of continuous features. See \code{forde} for options.
@@ -54,27 +53,20 @@
 #' data(single_cell)
 #' harf_model <- h_arf(
 #'   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
-#'   cli_lab_data = data.frame(cell_type = single_cell$cell_type),
-#'   parallel = TRUE,
-#'   verbose = FALSE
+#'   cli_lab_data = data.frame(cell_type = single_cell$cell_type)
 #' )
 #' # Unconditional sampling from harf_model
 #' set.seed(123)
 #' synth_single_cell <- h_forge(
 #'  harf_obj = harf_model,
-#'  n_synth = nrow(single_cell),
-#'  evidence = NULL,
-#'  parallel = TRUE,
-#'  verbose = FALSE
+#'  n_synth = nrow(single_cell)
 #'  )
 #'  # Conditional resampling from harf_model
 #'  set.seed(142)
 #'  lung_single_cell <- h_forge(
 #'      harf_obj = harf_model,
 #'      n_synth = sum(single_cell$cell_type == "lung"),
-#'      evidence = data.frame(cell_type = "lung"),
-#'      verbose = FALSE,
-#'      parallel = TRUE
+#'      evidence = data.frame(cell_type = "lung")
 #'     )
 #' }
 
@@ -82,6 +74,7 @@ h_arf <- function (
     omx_data,
     cli_lab_data = NULL,
     target = NULL,
+    feature_ordering = NULL,
     omx_onset_data = NULL,
     num_trees = 10,
     min_node_size = 5,
@@ -89,16 +82,14 @@ h_arf <- function (
     correlation_mat = NULL,
     num_clusters = NULL,
     num_btwn_pcs = 2,
-    num_folds = 2,
     num_onset_pcs = 2,
     chunck_size = 10,
-    encode_clin_lab = FALSE,
     oob = FALSE,
     family = "truncnorm",
     finite_bounds = "no",
     alpha = 0,
     epsilon = 0.0,
-    parallel = TRUE,
+    parallel = FALSE,
     export_cor_mat = FALSE,
     verbose = FALSE
 ) {
@@ -175,6 +166,17 @@ h_arf <- function (
   if (!is.null(correlation_mat)) {
     cor_matrix <- correlation_mat
   }
+  # Filter out features with zero variance (i.e. correlation of NaN with all other features)
+  zero_var_features <- which(diag(cor_matrix) == 0 | is.na(diag(cor_matrix)))
+  if (length(zero_var_features) > 0) {
+    constant_features <- colnames(omx_data)[zero_var_features]
+    cor_matrix <- cor_matrix[-zero_var_features, -zero_var_features, drop = FALSE]
+    omx_const_data <- omx_data[, zero_var_features, drop = FALSE]
+    omx_data <- omx_data[, -zero_var_features, drop = FALSE]
+  } else {
+    constant_features <- NULL
+    omx_const_data <- NULL
+  }
   # PCA with encoded data
   projected_data <- fast.pca(
     X = cor_matrix,
@@ -193,7 +195,6 @@ h_arf <- function (
   cluster_splitting <- TRUE
   while (cluster_splitting) {
     max_cluster_size <- chunck_size
-    new_cluster_id <- max(feature_clusters) + 1
     cluster_splitting <- FALSE
     for (cluster in unique(feature_clusters)) {
       ftr_in_cluster <- which(feature_clusters == cluster)
@@ -212,6 +213,7 @@ h_arf <- function (
       }
     }
   }
+
   # Merge clusters with less than num_btwn_pcs to nearest cluster
   for (cluster in unique(feature_clusters)) {
     ftr_in_cluster <- which(feature_clusters == cluster)
@@ -401,7 +403,6 @@ h_arf <- function (
                 iso_arf = iso_arf,
                 iso_forde = iso_forde))
   }
-
   arf_models <- lapply(
     sort(unique(feature_clusters)),
     arf_clusters
@@ -423,6 +424,12 @@ h_arf <- function (
                  # clin_lab_rfae = if (exists("cli_lab_rfae")) cli_lab_rfae else NULL,
                  omx_features = omx_features,
                  cli_lab_features = cln_cli_lab_data,
+                 omx_constant_data = if (length(constant_features) > 0) {
+                   omx_const_data[1, , drop = FALSE]
+                 } else {
+                   NULL
+                 },
+                 feature_ordering = feature_ordering,
                  accuracy = acc
   )
   class(hd_arf) <- "harf"

@@ -32,27 +32,20 @@
 #' data(single_cell)
 #' harf_model <- h_arf(
 #'   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
-#'   cli_lab_data = data.frame(cell_type = single_cell$cell_type),
-#'   parallel = TRUE,
-#'   verbose = FALSE
+#'   cli_lab_data = data.frame(cell_type = single_cell$cell_type)
 #' )
 #' # Unconditional sampling from harf_model
 #' set.seed(123)
 #' synth_single_cell <- h_forge(
 #'  harf_obj = harf_model,
-#'  n_synth = nrow(single_cell),
-#'  evidence = NULL,
-#'  parallel = TRUE,
-#'  verbose = FALSE
+#'  n_synth = nrow(single_cell)
 #'  )
 #'  # Conditional resampling from harf_model
 #'  set.seed(142)
 #'  lung_single_cell <- h_forge(
 #'      harf_obj = harf_model,
 #'      n_synth = sum(single_cell$cell_type == "lung"),
-#'      evidence = data.frame(cell_type = "lung"),
-#'      verbose = FALSE,
-#'      parallel = TRUE
+#'      evidence = data.frame(cell_type = "lung")
 #'     )
 #' }
 h_forge <- function (
@@ -157,12 +150,23 @@ h_forge <- function (
   }
   # Combine all synthetic omics data
   synth_omx_data <- do.call(cbind, synth_omx_data_list)
+  # Also include constant features if they exist in the original data
+  constant_data <- if (!is.null(harf_obj$omx_constant_data)) {
+    do.call("rbind", lapply(1:n_synth, function(x) harf_obj$omx_constant_data))
+  } else {
+    NULL
+  }
+  synth_omx_data <- cbind(synth_omx_data, constant_data)
   if (!is.null(harf_obj$cli_lab_feature)) {
     synth_data <- data.table::data.table(synth_omx_data,
                              meta_data[ , harf_obj$cli_lab_feature,
                                         drop = FALSE])
   } else {
     synth_data <- data.table::data.table(synth_omx_data)
+  }
+  # re-order features if required
+  if (!is.null(harf_obj$feature_ordering)) {
+    synth_data <- synth_data[ , ..harf_obj$feature_ordering, with = FALSE]
   }
   return(synth_data)
 }

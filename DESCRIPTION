@@ -5,9 +5,7 @@ Authors@R: c(person(given = c("Cesaire", "J."),
                       family = c("K.", "Fouodo"),
                       role = c("aut", "cre"),
                       email = "fouodo@leibniz-bips.de"))
-Description: High-dimensional Adversarial Random Forests (HARF) extend the 
-             classical Adversarial Random Forests (ARF) to high-dimensional settings.
-             ToDo: Complete-me...
+Description: High-dimensional Adversarial Random Forests (HARFs) extend classical Adversarial Random Forests (ARFs) to high-dimensional settings. The method partitions the feature space into regions where joint independence within tree leaves can be more effectively achieved. Region-specific ARF models are then trained to capture local data structure and generate synthetic observations.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
