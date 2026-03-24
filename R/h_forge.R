@@ -151,6 +151,7 @@ h_forge <- function (
   # }
 
   # Parallelize with forech if requested
+  i <- NULL
   if (isTRUE(parallel)) {
     synth_omx_data_list <- foreach::foreach(i = 1:length(harf_obj$models),
                                             .packages = "arf") %dopar% {
