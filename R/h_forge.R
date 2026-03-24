@@ -145,10 +145,10 @@ h_forge <- function (
     synth_data <- synth_data[ , harf_obj$models[[mdl_idx]]$ftr_in_cluster, drop = FALSE]
     return(synth_data)
   }
-  synth_omx_data_list <- vector("list", length(harf_obj$models))
-  for (i in 1:length(harf_obj$models)) {
-    synth_omx_data_list[[i]] <- synth_omx(i)
-  }
+  # synth_omx_data_list <- vector("list", length(harf_obj$models))
+  # for (i in 1:length(harf_obj$models)) {
+  #   synth_omx_data_list[[i]] <- synth_omx(i)
+  # }
 
   # Parallelize with forech if requested
   if (isTRUE(parallel)) {
