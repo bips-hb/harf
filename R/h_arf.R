@@ -156,6 +156,11 @@ h_arf <- function (
   if (isTRUE(verbose)) {
     message("Clustering features...\n")
   }
+  if (!is.null(feature_ordering)) {
+    if (!all(feature_ordering %in% c(colnames(omx_data), colnames(cli_lab_data)))) {
+      stop("All features in feature_ordering must be present in omx_data and cli_lab_data.")
+    }
+  }
   # Encoding via fast correlation and PCA
   if ((correlation_method == "spearman") & is.null(correlation_mat)) {
     cor_matrix <- fastcor(t(as.matrix(omx_data)))
@@ -419,10 +424,10 @@ h_arf <- function (
     ) %do% {
       arf_clusters(cluster)
     }
-  # arf_models <- lapply(
-  #   sort(unique(feature_clusters)),
-  #   arf_clusters
-  # )
+    # arf_models <- lapply(
+    #   sort(unique(feature_clusters)),
+    #   arf_clusters
+    # )
   }
   # Save accuracy for each cluster model
   for (i in seq_along(arf_models)) {
