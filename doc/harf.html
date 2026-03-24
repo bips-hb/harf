@@ -12,9 +12,9 @@
 
 <meta name="author" content="Cesaire Fouodo" />
 
-<meta name="date" content="2026-03-10" />
+<meta name="date" content="2026-03-24" />
 
-<title>How does HARH work?</title>
+<title>How does harf work?</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -339,9 +339,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">How does HARH work?</h1>
+<h1 class="title toc-ignore">How does harf work?</h1>
 <h4 class="author">Cesaire Fouodo</h4>
-<h4 class="date">2026-03-10</h4>
+<h4 class="date">2026-03-24</h4>
 
 
 <div id="TOC">
@@ -529,17 +529,19 @@ runtime.</p>
 <span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 87.08%</span></span>
 <span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 48.28%</span></span>
 <span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a><span class="fu">str</span>(harf_model,<span class="at">max.level =</span> <span class="dv">1</span>)</span>
-<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a><span class="co">#&gt; List of 8</span></span>
-<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a><span class="co">#&gt;  $ meta_model      :List of 3</span></span>
-<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a><span class="co">#&gt;  $ cor_matrix      : NULL</span></span>
-<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a><span class="co">#&gt;  $ models          :List of 16</span></span>
-<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a><span class="co">#&gt;  $ cluster         :&#39;data.frame&#39;:    80 obs. of  2 variables:</span></span>
-<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a><span class="co">#&gt;  $ meta_features   :&#39;data.frame&#39;:    1652 obs. of  3 variables:</span></span>
-<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a><span class="co">#&gt;  $ omx_features    : chr [1:80] &quot;V1&quot; &quot;V2&quot; &quot;V3&quot; &quot;V4&quot; ...</span></span>
-<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a><span class="co">#&gt;  $ cli_lab_features: chr &quot;cell_type&quot;</span></span>
-<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a><span class="co">#&gt;  $ accuracy        : Named num [1:17] 0.44 0.484 0.468 0.473 0.463 ...</span></span>
-<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:17] &quot;meta_model&quot; &quot;cluster_2&quot; &quot;cluster_3&quot; &quot;cluster_4&quot; ...</span></span>
-<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;harf&quot;</span></span></code></pre></div>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a><span class="co">#&gt; List of 10</span></span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a><span class="co">#&gt;  $ meta_model       :List of 3</span></span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a><span class="co">#&gt;  $ cor_matrix       : NULL</span></span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a><span class="co">#&gt;  $ models           :List of 16</span></span>
+<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a><span class="co">#&gt;  $ cluster          :&#39;data.frame&#39;:   80 obs. of  2 variables:</span></span>
+<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a><span class="co">#&gt;  $ meta_features    :&#39;data.frame&#39;:   1652 obs. of  3 variables:</span></span>
+<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a><span class="co">#&gt;  $ omx_features     : chr [1:80] &quot;V1&quot; &quot;V2&quot; &quot;V3&quot; &quot;V4&quot; ...</span></span>
+<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a><span class="co">#&gt;  $ cli_lab_features : chr &quot;cell_type&quot;</span></span>
+<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a><span class="co">#&gt;  $ omx_constant_data: NULL</span></span>
+<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a><span class="co">#&gt;  $ feature_ordering : NULL</span></span>
+<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a><span class="co">#&gt;  $ accuracy         : Named num [1:17] 0.44 0.484 0.468 0.473 0.463 ...</span></span>
+<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:17] &quot;meta_model&quot; &quot;cluster_2&quot; &quot;cluster_3&quot; &quot;cluster_4&quot; ...</span></span>
+<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;harf&quot;</span></span></code></pre></div>
 </div>
 <div id="inspect-accuracy-of-the-harf-model" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Inspect accuracy of
@@ -729,8 +731,8 @@ variable, since the provided original tumor stages were difficult to
 predict. The dataset contains <span class="math inline">\(66\)</span>
 samples and the top <span class="math inline">\(140\)</span> gene
 expression with the highest empirical variances. We include age and
-gender as additional clinical variables. To create the response
-variable, we fix age and the first <span class="math inline">\(10\)</span> gene expression variables to drive an
+gender as additional clinical variables. We scale gene expressions and
+age. To create the response variable, we fix age and the first <span class="math inline">\(10\)</span> gene expression variables to drive an
 effect. We set the effect of age to <span class="math inline">\(0.5\)</span>, and draw the effects of gene
 expressions uniformly from interval <span class="math inline">\([-1,
 1]\)</span>. Subsequently, we train a HARF model using the

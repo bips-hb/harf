@@ -24,6 +24,7 @@
 #' @param parallel Compute in parallel? See \code{forde} for details.
 #'
 #' @returns A data.table containing the generated synthetic omics data.
+#' @importFrom foreach foreach %do% %dopar%
 #' @seealso \code{\link[arf]{forge}} for details on the forging process.
 #' @export
 #' @author Césaire Fouodo
@@ -121,7 +122,7 @@ h_forge <- function (
     nomatch = nomatch,
     verbose = verbose,
     stepsize = stepsize,
-    parallel = parallel
+    parallel = FALSE
   )
   # For the remaining clusters, generate synthetic data conditioned on the current evidence
   synth_omx <- function (mdl_idx) {
@@ -148,25 +149,38 @@ h_forge <- function (
   for (i in 1:length(harf_obj$models)) {
     synth_omx_data_list[[i]] <- synth_omx(i)
   }
+
+  # Parallelize with forech if requested
+  if (isTRUE(parallel)) {
+    synth_omx_data_list <- foreach::foreach(i = 1:length(harf_obj$models),
+                                            .packages = "arf") %dopar% {
+                                              synth_omx(i)
+                                            }
+  } else {
+    synth_omx_data_list <- foreach::foreach(i = 1:length(harf_obj$models),
+                                            .packages = "arf") %do% {
+                                              synth_omx(i)
+                                            }
+  }
   # Combine all synthetic omics data
   synth_omx_data <- do.call(cbind, synth_omx_data_list)
   # Also include constant features if they exist in the original data
-  constant_data <- if (!is.null(harf_obj$omx_constant_data)) {
-    do.call("rbind", lapply(1:n_synth, function(x) harf_obj$omx_constant_data))
+  if (!is.null(harf_obj$omx_constant_data)) {
+    constant_data <- do.call("rbind", lapply(1:n_synth, function(x) harf_obj$omx_constant_data))
+    synth_omx_data <- cbind(synth_omx_data, constant_data)
   } else {
     NULL
   }
-  synth_omx_data <- cbind(synth_omx_data, constant_data)
   if (!is.null(harf_obj$cli_lab_feature)) {
     synth_data <- data.table::data.table(synth_omx_data,
-                             meta_data[ , harf_obj$cli_lab_feature,
-                                        drop = FALSE])
+                                         meta_data[ , harf_obj$cli_lab_feature,
+                                                    drop = FALSE])
   } else {
     synth_data <- data.table::data.table(synth_omx_data)
   }
   # re-order features if required
   if (!is.null(harf_obj$feature_ordering)) {
-    synth_data <- synth_data[ , ..harf_obj$feature_ordering, with = FALSE]
+    data.table::setcolorder(synth_data,harf_obj$feature_ordering)
   }
   return(synth_data)
 }

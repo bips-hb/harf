@@ -21,7 +21,8 @@ Imports:
     fastPLS,
     RGCCA,
     ranger,
-    rsvd
+    rsvd,
+    foreach
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

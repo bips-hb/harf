@@ -46,6 +46,7 @@
 #' @importFrom stats cor dist prcomp
 #' @importFrom ranger ranger
 #' @importFrom RGCCA rgcca
+#' @importFrom foreach foreach %do% %dopar%
 #' @export
 #' @seealso [h_forge], [arf::adversarial_rf], [arf::forde]
 #' @examples
@@ -403,10 +404,26 @@ h_arf <- function (
                 iso_arf = iso_arf,
                 iso_forde = iso_forde))
   }
-  arf_models <- lapply(
-    sort(unique(feature_clusters)),
-    arf_clusters
-  )
+  # Parallelize with foreach il parallel = TRUE
+  if (isTRUE(parallel)) {
+    arf_models <- foreach::foreach(
+      cluster = sort(unique(feature_clusters)),
+      .packages = c("arf")
+    ) %dopar% {
+      arf_clusters(cluster)
+    }
+  } else {
+    arf_models <- foreach::foreach(
+      cluster = sort(unique(feature_clusters)),
+      .packages = c("arf")
+    ) %do% {
+      arf_clusters(cluster)
+    }
+  # arf_models <- lapply(
+  #   sort(unique(feature_clusters)),
+  #   arf_clusters
+  # )
+  }
   # Save accuracy for each cluster model
   for (i in seq_along(arf_models)) {
     acc[paste0("cluster_", arf_models[[i]]$cluster_id)] <-

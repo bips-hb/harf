@@ -71,10 +71,10 @@ acc_plot
 set.seed(321)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
-  n_synth = nrow(single_cell), 
+  n_synth = nrow(single_cell),
   evidence = NULL,
-  parallel = FALSE,
-  verbose = FALSE
+  parallel = TRUE,
+  verbose = TRUE
   )
 
 ## ----harf_correlation_matrices, include = TRUE, eval = TRUE, message = FALSE, fig.width = 3.5, fig.height = 3----
@@ -111,11 +111,11 @@ tsne_it <- function (sc_data, perp = 30, title = "") {
     check_duplicates = FALSE
   )
   SingleCellExperiment::reducedDim(sce, "tsne") = ts_sce$Y
-  sce_plot <- scater::plotReducedDim(sce, "tsne", colour_by = "cell_type") + 
+  sce_plot <- scater::plotReducedDim(sce, "tsne", colour_by = "cell_type") +
   ggplot2::ggtitle(title) +
   ggplot2::theme(legend.position = "bottom")
   return(sce_plot)
-}  
+}
 orig_plot <- tsne_it(single_cell,
                      perp = 30,
                      title = "Original")

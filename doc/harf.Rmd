@@ -1,5 +1,5 @@
 ---
-title: "How does HARH work?"
+title: "How does harf work?"
 author: "Cesaire Fouodo"
 date: "`r Sys.Date()`"
 output:
@@ -8,7 +8,7 @@ output:
     toc_depth: 3         # include headers up to ###
     number_sections: true  # automatically number sections
 vignette: >
-  %\VignetteIndexEntry{How does HARH work?}
+  %\VignetteIndexEntry{How does harf work?}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -261,7 +261,7 @@ par(mfrow = c(1, 1))
 Again, both the correlation structure and the cluster structure are well preserved in the conditionally generated synthetic data.
 
 # Supervised data generating process
-The goal is to generate synthetic gene expression data that can be used to evaluate the performance of a prediction model in the absence of original testing datasets, in a situation in which researchers may not have enough samples for eventual internal validation such as corss-validation. As supervised downstream analysis example, we consider the Cancer Genome Atlas Kidney Chromophobe Collection (TCGA-KICH) gene expression predictors, with artificial tumor stage as binary response variable, since the provided original tumor stages were difficult to predict. The dataset contains $66$ samples and the top $140$ gene expression with the highest empirical variances. We include age and gender as additional clinical variables. To create the response variable, we fix age and the first $10$ gene expression variables to drive an effect. We set the effect of age to $0.5$, and draw the effects of gene expressions uniformly from interval $[-1, 1]$. Subsequently, we train a HARF model using the `h_arf` function on the training data, where the gene expression measurements are provided as the `omx_data` argument, and the binary outcome variable and addition variables including age and gender ($27$ males and $39$ females) are passed as the `cli_lab_data` argument. We also specify the target variable using the parameter `target`. We set the maximal chunk size to $10$, to specify the maximal number of features allowed in an isolated region. After training the HARF model, we use the `h_forge` function to generate synthetic training dataset. We then train a prediction model, on the original and the synthetic training data and evaluate their performances a common testing data. We report the area Receiver Operating Characteristic (ROC) curve (AUC) as performance metric. We expect that the prediction model trained on the synthetic data will have a similar performance to the one trained on the original data, indicating that the HARF model effectively captures the underlying structure of the original data and can be used to generate realistic synthetic datasets for prediction tasks.
+The goal is to generate synthetic gene expression data that can be used to evaluate the performance of a prediction model in the absence of original testing datasets, in a situation in which researchers may not have enough samples for eventual internal validation such as corss-validation. As supervised downstream analysis example, we consider the Cancer Genome Atlas Kidney Chromophobe Collection (TCGA-KICH) gene expression predictors, with artificial tumor stage as binary response variable, since the provided original tumor stages were difficult to predict. The dataset contains $66$ samples and the top $140$ gene expression with the highest empirical variances. We include age and gender as additional clinical variables. We scale gene expressions and age. To create the response variable, we fix age and the first $10$ gene expression variables to drive an effect. We set the effect of age to $0.5$, and draw the effects of gene expressions uniformly from interval $[-1, 1]$. Subsequently, we train a HARF model using the `h_arf` function on the training data, where the gene expression measurements are provided as the `omx_data` argument, and the binary outcome variable and addition variables including age and gender ($27$ males and $39$ females) are passed as the `cli_lab_data` argument. We also specify the target variable using the parameter `target`. We set the maximal chunk size to $10$, to specify the maximal number of features allowed in an isolated region. After training the HARF model, we use the `h_forge` function to generate synthetic training dataset. We then train a prediction model, on the original and the synthetic training data and evaluate their performances a common testing data. We report the area Receiver Operating Characteristic (ROC) curve (AUC) as performance metric. We expect that the prediction model trained on the synthetic data will have a similar performance to the one trained on the original data, indicating that the HARF model effectively captures the underlying structure of the original data and can be used to generate realistic synthetic datasets for prediction tasks.
 
 We set up the required libraries.
 ```{r load_libraries_supervised, warning = FALSE, message = FALSE}

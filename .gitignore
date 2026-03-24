@@ -55,3 +55,6 @@ rsconnect/
 
 # File to prepare data for illustration in prediction dowstream analysis
 /preddata/
+
+# Ignore git
+^\.git$
