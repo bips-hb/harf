@@ -377,7 +377,6 @@ h_arf <- function (
     ftr_data_subset <- data.frame(ftr_data_subset,
                                   meta_features)
     # Adversarial game in isolated regions
-    print(ftr_data_subset[1:10, ])
     iso_arf <- arf::adversarial_rf(
       x = ftr_data_subset,
       num_trees = num_trees,
@@ -478,7 +477,7 @@ supervised_pls <- function(
     y,
     num_btwn_pcs = 2
 ) {
-  if (is.factor(y)) {
+  if (is.factor(y) | is.character(y)) {
     y_onehat <- model.matrix(~ y - 1)
   } else {
     y_onehat <- y
