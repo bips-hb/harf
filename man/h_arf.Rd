@@ -14,7 +14,6 @@ h_arf(
   min_node_size = 5,
   correlation_method = "spearman",
   correlation_mat = NULL,
-  num_clusters = NULL,
   num_btwn_pcs = 2,
   num_onset_pcs = 2,
   chunck_size = 10,
@@ -52,9 +51,6 @@ dimension reduction. If NULL, unsupervised dimension reduction is performed.}
 Options include "pearson", "spearman", and "kendall". Default is "spearman".}
 
 \item{correlation_mat}{Optional pre-computed correlation matrix between features. If provided, this will be used instead of computing correlations from \code{omx_data}. This can be usefull for tuning hyperparameters of the clustering step without having to recompute the correlation matrix each time.}
-
-\item{num_clusters}{Number of clusters to form. If NULL, the optimal number
-of clusters is found by finding the elbow method.}
 
 \item{num_btwn_pcs}{Number of principal components to use for between cluster variability. Default is 2.}
 

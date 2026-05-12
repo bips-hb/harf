@@ -19,8 +19,6 @@
 #' @param correlation_method Methods to compute correlation between features.
 #' Options include "pearson", "spearman", and "kendall". Default is "spearman".
 #' @param correlation_mat Optional pre-computed correlation matrix between features. If provided, this will be used instead of computing correlations from \code{omx_data}. This can be usefull for tuning hyperparameters of the clustering step without having to recompute the correlation matrix each time.
-#' @param num_clusters Number of clusters to form. If NULL, the optimal number
-#' of clusters is found by finding the elbow method.
 #' @param num_btwn_pcs Number of principal components to use for between cluster variability. Default is 2.
 #' @param num_onset_pcs Number of principal components to use for onset features.
 #' Default is 2.
@@ -81,7 +79,6 @@ h_arf <- function (
     min_node_size = 5,
     correlation_method = "spearman",
     correlation_mat = NULL,
-    num_clusters = NULL,
     num_btwn_pcs = 2,
     num_onset_pcs = 2,
     chunck_size = 10,
@@ -338,6 +335,7 @@ h_arf <- function (
   if (isTRUE(verbose)) {
     message("Fitting the meta ARF model...\n")
   }
+  print(meta_features[1:10, ])
   meta_arf <- arf::adversarial_rf(
     x = meta_features,
     num_trees = num_trees,
