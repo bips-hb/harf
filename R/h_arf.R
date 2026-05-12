@@ -335,7 +335,6 @@ h_arf <- function (
   if (isTRUE(verbose)) {
     message("Fitting the meta ARF model...\n")
   }
-  print(meta_features[1:10, ])
   meta_arf <- arf::adversarial_rf(
     x = meta_features,
     num_trees = num_trees,
@@ -378,6 +377,7 @@ h_arf <- function (
     ftr_data_subset <- data.frame(ftr_data_subset,
                                   meta_features)
     # Adversarial game in isolated regions
+    print(ftr_data_subset[1:10, ])
     iso_arf <- arf::adversarial_rf(
       x = ftr_data_subset,
       num_trees = num_trees,
