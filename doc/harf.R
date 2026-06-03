@@ -33,7 +33,7 @@ library(scater)
 library(doParallel)
 registerDoParallel(cores = 2)
 # Set seed
-set.seed(123, "L'Ecuyer-CMRG")
+set.seed(12, "L'Ecuyer-CMRG")
 
 ## ----single_cell_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE----
 data("single_cell")
@@ -69,7 +69,7 @@ acc_plot <- ggplot2::ggplot(acc_df, ggplot2::aes(x = Region, y = Accuracy)) +
 acc_plot
 
 ## ----harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE----------
-set.seed(321)
+set.seed(32)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell), 

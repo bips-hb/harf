@@ -74,7 +74,7 @@ library(scater)
 library(doParallel)
 registerDoParallel(cores = 2)
 # Set seed
-set.seed(123, "L'Ecuyer-CMRG")
+set.seed(12, "L'Ecuyer-CMRG")
 ```
 
 In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The *h*-ARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be mixed (categorical or numeric). In the following example, gene expression measurements are used as the omics data, while cell type serves as the labor information. Our first aim is to train a generative model to generate synthetic data that preserves the underlying structure of the original data, including the correlation structure between features and the cluster structure of cells.
@@ -127,7 +127,7 @@ acc_plot
 We use the `h_forge` function to generate sznthsize single cell data using the trained {h}-ARF model. Here, we generate the same number of synthetic samples as in the original dataset, and without any evidence, i.e. without any prio information regarding the the single cell classes (`evidence = NULL`). As we will see later, the `evidence` argument can be used to generate synthetic data conditionally on a specific cell types. The generated synthetic data are stored in the `synth_single_cell` object.
 
 ```{r harf_synthetic_data, include = TRUE, eval = TRUE, message=FALSE}
-set.seed(321)
+set.seed(32)
 synth_single_cell <- h_forge(
   harf_obj = harf_model,
   n_synth = nrow(single_cell), 
