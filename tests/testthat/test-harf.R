@@ -11,7 +11,7 @@ test_that("Adversarial game for clustering works crrectly", {
   iris_data <- datasets::iris
     harf_cl_obj <- h_arf(omx_data = iris_data[ , -5],
                       cli_lab_data = iris_data[ , 5, drop = FALSE],
-                      chunck_size = 2,
+                      chunk_size = 2,
                       target = NULL,
                       parallel = FALSE,
                       verbose = FALSE)
@@ -32,7 +32,7 @@ test_that("Adversarial game for prediction works correctly", {
   iris_data <- datasets::iris
     harf_prd_obj <- h_arf(omx_data = iris_data[ , -5],
                       cli_lab_data = iris_data[ , 5, drop = FALSE],
-                      chunck_size = 2,
+                      chunk_size = 2,
                       target = "Species",
                       parallel = FALSE,
                       verbose = FALSE)

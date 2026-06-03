@@ -97,7 +97,7 @@ harf_model <- h_arf(
  cli_lab_data = my_cli_lab_data,
  feature_ordering = colnames(single_cell),
  parallel = FALSE,
- chunck_size = chunk_size,
+ chunk_size = chunk_size,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
@@ -311,7 +311,7 @@ kich_harf <- h_arf(
   omx_data = kich[train_idx , !(colnames(kich) %in% c("tumor_stage",
                                                       "age", "gender"))],
                    cli_lab_data = kich[train_idx, c("tumor_stage", "age", "gender")],
-                   chunck_size = 10,
+                   chunk_size = 10,
                    target = "tumor_stage",
                    verbose = TRUE
   )

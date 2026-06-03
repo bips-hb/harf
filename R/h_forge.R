@@ -62,11 +62,9 @@ h_forge <- function (
     stepsize = 0,
     parallel = TRUE
 ) {
-  # Test that harf_obj is of class harf
   if (!inherits(harf_obj, "harf")) {
     stop("harf_obj must be an object of class 'harf'.")
   }
-  # n_synth must be an integer greater than 0
   if (!is.numeric(n_synth) | n_synth <= 0 | n_synth != round(n_synth)) {
     stop("n_synth must be a positive integer.")
   }
@@ -145,10 +143,6 @@ h_forge <- function (
     synth_data <- synth_data[ , harf_obj$models[[mdl_idx]]$ftr_in_cluster, drop = FALSE]
     return(synth_data)
   }
-  # synth_omx_data_list <- vector("list", length(harf_obj$models))
-  # for (i in 1:length(harf_obj$models)) {
-  #   synth_omx_data_list[[i]] <- synth_omx(i)
-  # }
 
   # Parallelize with forech if requested
   i <- NULL

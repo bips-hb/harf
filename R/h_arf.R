@@ -1,43 +1,29 @@
-#' High-dimensional Adversarial Random Forest
+#' High-dimensional Adversarial Random Forest (ARF) for omics and clinical data.
 #'
-#' The algorithm partitions high-dimensional data into isolated regions and fits
-#' Adversarial Random Forest (ARF) models within each region to capture local
-#' dependencies.
+#' The algorithm extends (ARF) to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits Adversarial Random Forest (ARF) models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
 #'
-#' @param omx_data A data.frame containing omics data where rows
-#' represent samples (e.g. patients or cells) and columns represent features
-#' (e.g., gene or protein expressions).
-#' @param cli_lab_data A data.frame of clinical or laboratory data. For example,
-#' this may be a data.frame where rows represent cell types (for single cell data)
-#' or additional clinical patient information (e.g. disease status).
-#' @param target Optional name of the target variable in \code{cli_lab_data} for supervised
-#' dimension reduction. If NULL, unsupervised dimension reduction is performed.
+#' @param omx_data A data.frame containing omics data where rows represent samples (e.g. patients or cells) and columns represent features (e.g., gene or protein expressions).
+#' @param cli_lab_data A data.frame of clinical or laboratory data. For example, this may be a data.frame where rows represent cell types (for single cell data or additional clinical patient information, e.g. disease status, age, sex, BMI, etc).
+#' @param target Optional name of the target variable in \code{cli_lab_data} for supervised downstream analysis. If NULL, training is conducted for unsupervised downstream analysis.
 #' @param feature_ordering Optional vector of feature names specifying the order of features in the synthesized data. If NULL, features are ordered according to their original order in \code{omx_data}, followed by order in \code{clin_lab_data}.
-#' @param omx_onset_data Optional data.frame of conditional onset omics features.
+#' @param omx_onset_data Optional data.frame of conditional onset omics features. This can be used to condition the synthesis on specific omics features (e.g. expression of a gene of interest). If provided, dimension reduction will be performed on these features and the resulting components will be included as additional meta features for training the meta adversarial model.
 #' @param num_trees Number of trees to grow in each Adversarial Random Forest (ARF) model.
 #' @param min_node_size Minimum number of samples required to split an internal node in the ARF model.
-#' @param correlation_method Methods to compute correlation between features.
-#' Options include "pearson", "spearman", and "kendall". Default is "spearman".
+#' @param correlation_method Methods to compute correlation between features. Options include "pearson", "spearman", and "kendall". Default is "spearman".
 #' @param correlation_mat Optional pre-computed correlation matrix between features. If provided, this will be used instead of computing correlations from \code{omx_data}. This can be usefull for tuning hyperparameters of the clustering step without having to recompute the correlation matrix each time.
 #' @param num_btwn_pcs Number of principal components to use for between cluster variability. Default is 2.
-#' @param num_onset_pcs Number of principal components to use for onset features.
-#' Default is 2.
-#' @param chunck_size Size of feature chuncks to process at a time. Default is 10.
-#' @param oob Logical indicating whether to use out-of-bag samples for density estimation.
-#' Default is FALSE. Also see \code{forde}
+#' @param num_onset_pcs Number of principal components to use for onset features. Default is 2.
+#' @param chunk_size Size of feature chunks to process at a time. Default is 10.
+#' @param oob Logical indicating whether to use out-of-bag samples for density estimation. Default is FALSE. Also see \code{forde}
 #' @param family Distribution to use for density estimation of continuous features. See \code{forde} for options.
-#' @param finite_bounds Impose finite bounds on all continuous variables?
-#' If "local", infinite bounds are set to empirical extrema within leaves.
-#' If "global", infinite bounds are set to global empirical extrema. if "no"
-#' (the default), infinite bounds are left unchanged. See \code{forde} for more details.
+#' @param finite_bounds Impose finite bounds on all continuous variables? If "local", infinite bounds are set to empirical extrema within leaves. If "global", infinite bounds are set to global empirical extrema. if "no" (the default), infinite bounds are left unchanged. See \code{forde} for more details.
 #' @param alpha Optional pseudocount for Laplace smoothing in density estimation. See \code{forde} for more details.
 #' @param epsilon Optional slack parameter on empirical bounds. See \code{forde} for more details.
 #' @param parallel Logical indicating whether to use parallel processing. Default is TRUE.
 #' @param export_cor_mat Logical indicating whether to export the correlation matrix used for clustering. Default is FALSE.
 #' @param verbose Logical indicating whether to print progress messages. Default is FALSE.
 #'
-#' @returns An isoARF object containing the fitted adversarial models, and clustering
-#' information.
+#' @returns An isoARF object containing the fitted adversarial models, and clustering information.
 #' @importFrom ClusterR KMeans_rcpp
 #' @importFrom fastPLS fastcor
 #' @importFrom rsvd rpca
@@ -81,7 +67,7 @@ h_arf <- function (
     correlation_mat = NULL,
     num_btwn_pcs = 2,
     num_onset_pcs = 2,
-    chunck_size = 10,
+    chunk_size = 10,
     oob = FALSE,
     family = "truncnorm",
     finite_bounds = "no",
@@ -138,8 +124,8 @@ h_arf <- function (
       stop("correlation_mat must be a square matrix with dimensions equal to the number of features in omx_data.")
     }
   }
-  if (!is.numeric(chunck_size) | chunck_size <= 0 | chunck_size != round(chunck_size)) {
-    stop("chunck_size must be a positive integer.")
+  if (!is.numeric(chunk_size) | chunk_size <= 0 | chunk_size != round(chunk_size)) {
+    stop("chunk_size must be a positive integer.")
   }
   if (!is.logical(verbose)) {
     stop("verbose must be a logical value (TRUE or FALSE).")
@@ -187,17 +173,17 @@ h_arf <- function (
   )
   # kmeans clustering around medoids
   kmeanpp_fit <- KMeans_rcpp(projected_data,
-                             clusters = floor(ncol(omx_data) / chunck_size),
+                             clusters = floor(ncol(omx_data) / chunk_size),
                              num_init = 5,
                              max_iters = 100,
                              initializer = 'kmeans++')
   # feature_clusters <- clara_fit$clustering
   feature_clusters <- kmeanpp_fit$clusters
-  # Re-split clusters that are larger than chunck_size
-  # if (!is.null(chunck_size)) {
+  # Re-split clusters that are larger than chunk_size
+  # if (!is.null(chunk_size)) {
   cluster_splitting <- TRUE
   while (cluster_splitting) {
-    max_cluster_size <- chunck_size
+    max_cluster_size <- chunk_size
     cluster_splitting <- FALSE
     for (cluster in unique(feature_clusters)) {
       ftr_in_cluster <- which(feature_clusters == cluster)

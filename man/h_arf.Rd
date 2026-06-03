@@ -2,7 +2,7 @@
 % Please edit documentation in R/h_arf.R
 \name{h_arf}
 \alias{h_arf}
-\title{High-dimensional Adversarial Random Forest}
+\title{High-dimensional Adversarial Random Forest (ARF) for omics and clinical data.}
 \usage{
 h_arf(
   omx_data,
@@ -16,7 +16,7 @@ h_arf(
   correlation_mat = NULL,
   num_btwn_pcs = 2,
   num_onset_pcs = 2,
-  chunck_size = 10,
+  chunk_size = 10,
   oob = FALSE,
   family = "truncnorm",
   finite_bounds = "no",
@@ -28,46 +28,35 @@ h_arf(
 )
 }
 \arguments{
-\item{omx_data}{A data.frame containing omics data where rows
-represent samples (e.g. patients or cells) and columns represent features
-(e.g., gene or protein expressions).}
+\item{omx_data}{A data.frame containing omics data where rows represent samples (e.g. patients or cells) and columns represent features (e.g., gene or protein expressions).}
 
-\item{cli_lab_data}{A data.frame of clinical or laboratory data. For example,
-this may be a data.frame where rows represent cell types (for single cell data)
-or additional clinical patient information (e.g. disease status).}
+\item{cli_lab_data}{A data.frame of clinical or laboratory data. For example, this may be a data.frame where rows represent cell types (for single cell data or additional clinical patient information, e.g. disease status, age, sex, BMI, etc).}
 
-\item{target}{Optional name of the target variable in \code{cli_lab_data} for supervised
-dimension reduction. If NULL, unsupervised dimension reduction is performed.}
+\item{target}{Optional name of the target variable in \code{cli_lab_data} for supervised downstream analysis. If NULL, training is conducted for unsupervised downstream analysis.}
 
 \item{feature_ordering}{Optional vector of feature names specifying the order of features in the synthesized data. If NULL, features are ordered according to their original order in \code{omx_data}, followed by order in \code{clin_lab_data}.}
 
-\item{omx_onset_data}{Optional data.frame of conditional onset omics features.}
+\item{omx_onset_data}{Optional data.frame of conditional onset omics features. This can be used to condition the synthesis on specific omics features (e.g. expression of a gene of interest). If provided, dimension reduction will be performed on these features and the resulting components will be included as additional meta features for training the meta adversarial model.}
 
 \item{num_trees}{Number of trees to grow in each Adversarial Random Forest (ARF) model.}
 
 \item{min_node_size}{Minimum number of samples required to split an internal node in the ARF model.}
 
-\item{correlation_method}{Methods to compute correlation between features.
-Options include "pearson", "spearman", and "kendall". Default is "spearman".}
+\item{correlation_method}{Methods to compute correlation between features. Options include "pearson", "spearman", and "kendall". Default is "spearman".}
 
 \item{correlation_mat}{Optional pre-computed correlation matrix between features. If provided, this will be used instead of computing correlations from \code{omx_data}. This can be usefull for tuning hyperparameters of the clustering step without having to recompute the correlation matrix each time.}
 
 \item{num_btwn_pcs}{Number of principal components to use for between cluster variability. Default is 2.}
 
-\item{num_onset_pcs}{Number of principal components to use for onset features.
-Default is 2.}
+\item{num_onset_pcs}{Number of principal components to use for onset features. Default is 2.}
 
-\item{chunck_size}{Size of feature chuncks to process at a time. Default is 10.}
+\item{chunk_size}{Size of feature chunks to process at a time. Default is 10.}
 
-\item{oob}{Logical indicating whether to use out-of-bag samples for density estimation.
-Default is FALSE. Also see \code{forde}}
+\item{oob}{Logical indicating whether to use out-of-bag samples for density estimation. Default is FALSE. Also see \code{forde}}
 
 \item{family}{Distribution to use for density estimation of continuous features. See \code{forde} for options.}
 
-\item{finite_bounds}{Impose finite bounds on all continuous variables?
-If "local", infinite bounds are set to empirical extrema within leaves.
-If "global", infinite bounds are set to global empirical extrema. if "no"
-(the default), infinite bounds are left unchanged. See \code{forde} for more details.}
+\item{finite_bounds}{Impose finite bounds on all continuous variables? If "local", infinite bounds are set to empirical extrema within leaves. If "global", infinite bounds are set to global empirical extrema. if "no" (the default), infinite bounds are left unchanged. See \code{forde} for more details.}
 
 \item{alpha}{Optional pseudocount for Laplace smoothing in density estimation. See \code{forde} for more details.}
 
@@ -80,13 +69,10 @@ If "global", infinite bounds are set to global empirical extrema. if "no"
 \item{verbose}{Logical indicating whether to print progress messages. Default is FALSE.}
 }
 \value{
-An isoARF object containing the fitted adversarial models, and clustering
-information.
+An isoARF object containing the fitted adversarial models, and clustering information.
 }
 \description{
-The algorithm partitions high-dimensional data into isolated regions and fits
-Adversarial Random Forest (ARF) models within each region to capture local
-dependencies.
+The algorithm extends (ARF) to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits Adversarial Random Forest (ARF) models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
 }
 \examples{
 \dontrun{
