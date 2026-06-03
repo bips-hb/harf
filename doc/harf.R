@@ -47,7 +47,7 @@ harf_model <- h_arf(
  cli_lab_data = my_cli_lab_data,
  feature_ordering = colnames(single_cell),
  parallel = FALSE,
- chunck_size = chunk_size,
+ chunk_size = chunk_size,
  verbose = TRUE
 )
 str(harf_model,max.level = 1)
@@ -61,7 +61,7 @@ acc_plot <- ggplot2::ggplot(acc_df, ggplot2::aes(x = Region, y = Accuracy)) +
   ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") +
   ggplot2::geom_bar(stat = "identity", fill = "steelblue") +
   ggplot2::ylim(0, 1) +
-  ggplot2::labs(title = "HARF Convergence Accuracy",
+  ggplot2::labs(title = "h-ARF Convergence Accuracy",
                 x = "Regions",
                 y = "Accuracy") +
   ggplot2::theme_minimal() +
@@ -219,7 +219,7 @@ kich_harf <- h_arf(
   omx_data = kich[train_idx , !(colnames(kich) %in% c("tumor_stage",
                                                       "age", "gender"))],
                    cli_lab_data = kich[train_idx, c("tumor_stage", "age", "gender")],
-                   chunck_size = 10,
+                   chunk_size = 10,
                    target = "tumor_stage",
                    verbose = TRUE
   )
