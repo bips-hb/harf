@@ -453,15 +453,15 @@ tissue of origin for each cell.</p>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>, <span class="st">&quot;L&#39;Ecuyer-CMRG&quot;</span>)</span></code></pre></div>
 <p>In genetic epidemiology studies, molecular (omics) data are typically
 accompanied by clinical or phenotypic variables that provide essential
-contextual information. The -ARF framework assumes that input data
-consist of two components: (i) high-dimensional numeric omics features
-and (ii) associated clinical or phenotypic variables, which may be mixed
-(categorical or numeric). In the following example, gene expression
-measurements are used as the omics data, while cell type serves as the
-labor information. Our first aim is to train a generative model to
-generate synthetic data that preserves the underlying structure of the
-original data, including the correlation structure between features and
-the cluster structure of cells.</p>
+contextual information. The <em>h</em>-ARF framework assumes that input
+data consist of two components: (i) high-dimensional numeric omics
+features and (ii) associated clinical or phenotypic variables, which may
+be mixed (categorical or numeric). In the following example, gene
+expression measurements are used as the omics data, while cell type
+serves as the labor information. Our first aim is to train a generative
+model to generate synthetic data that preserves the underlying structure
+of the original data, including the correlation structure between
+features and the cluster structure of cells.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;single_cell&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>chunk_size <span class="ot">&lt;-</span> <span class="dv">5</span></span></code></pre></div>
 <p>We set the chunk size size to 5 for illustration, but in practice,

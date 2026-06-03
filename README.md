@@ -38,17 +38,17 @@ still be correlated, not allowing for marginal resampling. A typical
 resulting behaviour of ARF in such a situation is that the algorithm
 terminates without converging.
 
-The high-dimensional adversarial random forests (-ARFs) package
+The high-dimensional adversarial random forests (*h*-ARFs) package
 addresses the convergence issue of ARF by identifying isolated regions
 of the feature space in which the independence assumption is more likely
-to hold in terminal nodes. In addition, the -ARF algorithm constructs a
-low-dimensional meta-space that captures the relationships among
+to hold in terminal nodes. In addition, the *h*-ARF algorithm constructs
+a low-dimensional meta-space that captures the relationships among
 regions. Within each isolated region, separate ARFs are trained to
 better capture local data structures, followed by training additional
 ARF in a meta-region that capture the joint structure between isolated
-regions. To synthesize observations, the -ARF algorithm first samples a
-region from the meta-space and then condition the resampling in the
-other isolated region by synthesized meta-observations. The -ARF
+regions. To synthesize observations, the *h*-ARF algorithm first samples
+a region from the meta-space and then condition the resampling in the
+other isolated region by synthesized meta-observations. The *h*-ARF
 algorithm offers a flexible framework for unconditional and conditional
 data generation for downstream clustering and prediction analyses. The
 package includes a built-in single-cell RNA-seq datasets and TCGA-KICH
