@@ -1,11 +1,11 @@
 Package: harf
-Title: High-dimensional Adversarial Random Forests
+Title: High-Dimensional Adversarial Random Forests
 Version: 0.1.0
 Authors@R: c(person(given = c("Cesaire", "J."),
                       family = c("K.", "Fouodo"),
                       role = c("aut", "cre"),
                       email = "fouodo@leibniz-bips.de"))
-Description: High-dimensional Adversarial Random Forests (HARFs) extend classical Adversarial Random Forests (ARFs) to high-dimensional settings. The method partitions the feature space into regions where joint independence within tree leaves can be more effectively achieved. Region-specific ARF models are then trained to capture local data structure and generate synthetic observations.
+Description: High-Dimensional Adversarial Random Forests extend classical Adversarial Random Forests to high-dimensional settings. The method partitions the feature space into regions where joint independence within tree leaves can be more effectively achieved. Region-specific adversarial random forest models are then trained to capture local data structure and generate synthetic observations.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

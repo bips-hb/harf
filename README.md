@@ -9,7 +9,7 @@ Status](https://img.shields.io/badge/CRAN-harf-orange)](https://cran.r-project.o
 
 <!-- badges: end -->
 
-## harf: High-Dimensional Adversarial Random Forests for Omics Data
+## harf: High-dimensional Adversarial Random Forests for Omics Data
 
 ## Introduction
 
