@@ -2,7 +2,7 @@
 
 [![R-CMD-check](https://github.com/bips-hb/harf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bips-hb/harf/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
-Unstable](https://img.shields.io/badge/lifecycle-Unstable-red.svg)](https://lifecycle.r-lib.org/articles/stages.html#Stable)
+Stable](https://img.shields.io/badge/lifecycle-Stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
 Status](https://img.shields.io/badge/CRAN-harf-orange)](https://cran.r-project.org/package=harf)
 <!-- [![codecov](https://codecov.io/github/bips-hb/harf/graph/badge.svg?token=SZU7NGK8G8)](https://app.codecov.io/github/bips-hb/harf/) -->
