@@ -58,3 +58,4 @@ rsconnect/
 
 # Ignore git
 ^\.git$
+docs

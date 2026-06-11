@@ -48,3 +48,4 @@ Collate:
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/bips-hb/harf/issues
 LazyData: true
+URL: https://bips-hb.github.io/harf/

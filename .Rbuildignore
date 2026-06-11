@@ -16,3 +16,5 @@ vignettes/figure-gfm/
 ^Meta$
 ^bin$
 ^preddata$
+^_pkgdown\.yml$
+^pkgdown$
