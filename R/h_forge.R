@@ -60,7 +60,7 @@ h_forge <- function (
     nomatch = c("force", "na"),
     verbose = TRUE,
     stepsize = 0,
-    parallel = TRUE
+    parallel = FALSE
 ) {
   if (!inherits(harf_obj, "harf")) {
     stop("harf_obj must be an object of class 'harf'.")

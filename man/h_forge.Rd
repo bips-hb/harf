@@ -15,7 +15,7 @@ h_forge(
   nomatch = c("force", "na"),
   verbose = TRUE,
   stepsize = 0,
-  parallel = TRUE
+  parallel = FALSE
 )
 }
 \arguments{
