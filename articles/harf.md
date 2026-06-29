@@ -500,13 +500,14 @@ kich_harf <- h_arf(
 #> Iteration: 0, Accuracy: 56.99%
 #> Iteration: 1, Accuracy: 38.04%
 #> Iteration: 0, Accuracy: 46.74%
-#> Iteration: 0, Accuracy: 47.87%
-#> Iteration: 0, Accuracy: 55.91%
-#> Iteration: 1, Accuracy: 46.24%
-#> Iteration: 0, Accuracy: 48.39%
-#> Iteration: 0, Accuracy: 46.24%
-#> Iteration: 0, Accuracy: 55.43%
-#> Iteration: 1, Accuracy: 44.68%
+#> Iteration: 0, Accuracy: 50.54%
+#> Iteration: 1, Accuracy: 40.86%
+#> Iteration: 0, Accuracy: 44.68%
+#> Iteration: 0, Accuracy: 59.57%
+#> Iteration: 1, Accuracy: 34.41%
+#> Iteration: 0, Accuracy: 53.19%
+#> Iteration: 1, Accuracy: 55.91%
+#> Iteration: 0, Accuracy: 47.83%
 ```
 
 ### Generating synthetic data
