@@ -6,7 +6,7 @@ The R package **harf** extends adversarial random forests (ARFs) to
 high-dimensional data. This vignette serves as a user guide to use the
 package effectively. Two key functionalities are provided: `h_arf` to
 train and estimate densities in a high-dimensional adversarial random
-forest ({h}-ARF), and `h_forge` for the synthetic data generating
+forest ($`h`$-ARF), and `h_forge` for the synthetic data generating
 process. Unconditional and conditional data generating processes are
 supported. The package is designed to handle high-dimensional omics
 data, such as gene expression measurements, and can be applied to
@@ -50,6 +50,8 @@ if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("SingleCellExperiment")
 BiocManager::install("scater")
+install.packages("pROC")
+install.packages("caret")
 install.packages("ggplot2")
 install.packages("corrplot")
 install.packages("doParallel")
@@ -68,6 +70,8 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
+library(pROC)
+library(caret)
 library(doParallel)
 ```
 
@@ -95,14 +99,14 @@ given performance measure.
 
 ### High-dimensional adversarial game
 
-We train a {h}-ARF model using the `h_arf` function. The gene expression
-measurements are provided as the `omx_data` argument, while the cell
-type information is passed as the `cli_lab_data` argument. We set the
-maximal chunk size to 5, to specify that maximal number of features
-allowed in an isolated region. This parameter is crucial for three main
-aspects, including (i) controlling the convergence of ARF in the
-isolated regions, (ii) learning the joint pattern between features, and
-(iii) managing the runtime.
+We train a $`h`$-ARF model using the `h_arf` function. The gene
+expression measurements are provided as the `omx_data` argument, while
+the cell type information is passed as the `cli_lab_data` argument. We
+set the maximal chunk size to 5, to specify that maximal number of
+features allowed in an isolated region. This parameter is crucial for
+three main aspects, including (i) controlling the convergence of ARF in
+the isolated regions, (ii) learning the joint pattern between features,
+and (iii) managing the runtime.
 
 ``` r
 
@@ -176,9 +180,9 @@ str(harf_model,max.level = 1)
 #>  - attr(*, "class")= chr "harf"
 ```
 
-### Inspect accuracy of the {h}-ARF model
+### Inspect accuracy of the $`h`$-ARF model
 
-We plot the accuracy of the {h}-ARF model across the training regions
+We plot the accuracy of the $`h`$-ARF model across the training regions
 and the meta region to ensure that the adversarial game has converged
 properly. An accuracy lesser than $`0.5`$ indicates that the ARF model
 locally converged, i.e. it stopped because it had not been able to
@@ -210,7 +214,7 @@ acc_plot
 ### Generating synthetic data
 
 We use the `h_forge` function to generate sznthsize single cell data
-using the trained {h}-ARF model. Here, we generate the same number of
+using the trained $`h`$-ARF model. Here, we generate the same number of
 synthetic samples as in the original dataset, and without any evidence,
 i.e. without any prio information regarding the the single cell classes
 (`evidence = NULL`). As we will see later, the `evidence` argument can
@@ -234,10 +238,10 @@ synth_single_cell <- h_forge(
 
 We visually compare the correlation matrices of the original data and
 the synthetic data. To enhance interpretability, we rearrange the
-features according to their region assignments obtained from the {h}-ARF
-model. The correlation plots exhibit similar patterns across the three
-datasets, indicating that the {h}-ARF model effectively preserve the
-origin feature correlation structure.
+features according to their region assignments obtained from the
+$`h`$-ARF model. The correlation plots exhibit similar patterns across
+the three datasets, indicating that the $`h`$-ARF model effectively
+preserve the origin feature correlation structure.
 
 ``` r
 
@@ -261,7 +265,7 @@ plot_corr <- function(dt, title) {
 
 We use t-SNE to visualize cells in a two-dimensional space. Original
 cell clusters are preserved in the synthetic data, indicating that the
-{h}-ARF model effectively captures the underlying cluster structure of
+$`h`$-ARF model effectively captures the underlying cluster structure of
 the original data.
 
 ``` r
@@ -397,21 +401,21 @@ gender as additional clinical variables. We scale gene expressions and
 age. To create the response variable, we fix age and the first $`10`$
 gene expression variables to drive an effect. We set the effect of age
 to $`0.5`$, and draw the effects of gene expressions uniformly from
-interval $`[-1, 1]`$. Subsequently, we train a {h}-ARF model using the
+interval $`[-1, 1]`$. Subsequently, we train a $`h`$-ARF model using the
 `h_arf` function on the training data, where the gene expression
 measurements are provided as the `omx_data` argument, and the binary
 outcome variable and addition variables including age and gender ($`27`$
 males and $`39`$ females) are passed as the `cli_lab_data` argument. We
 also specify the target variable using the parameter `target`. We set
 the maximal chunk size to $`10`$, to specify the maximal number of
-features allowed in an isolated region. After training the {h}-ARF
+features allowed in an isolated region. After training the $`h`$-ARF
 model, we use the `h_forge` function to generate synthetic training
 dataset. We then train a prediction model, on the original and the
 synthetic training data and evaluate their performances a common testing
 data. We report the area Receiver Operating Characteristic (ROC) curve
 (AUC) as performance metric. We expect that the prediction model trained
 on the synthetic data will have a similar performance to the one trained
-on the original data, indicating that the {h}-ARF model effectively
+on the original data, indicating that the $`h`$-ARF model effectively
 captures the underlying structure of the original data and can be used
 to generate realistic synthetic datasets for prediction tasks.
 
@@ -431,6 +435,7 @@ We load the `kich` dataset and create training and testing indices.
 ``` r
 
 data("kich")
+seed <- 123
 set.seed(seed)
 train_idx <- caret::createDataPartition(
   kich$tumor_stage,
@@ -462,7 +467,7 @@ print(paste("AUC:", auc_original))
 
 ### Supervised adversarial game
 
-We train a {h}-ARF model using the `h_arf` function on the training
+We train a $`h`$-ARF model using the `h_arf` function on the training
 data, where the gene expression measurements are provided as the
 `omx_data` argument, and the binary outcome variable and addition
 variables including age and gender are passed as the `cli_lab_data`
@@ -570,10 +575,10 @@ effectively handle high-dimensional omics data and supports both
 unconditional and conditional data generation. We have illustrated the
 usage of the package in both unsupervised and supervised downstream
 analysis contexts. In the unsupervised context, we demonstrated that the
-{h}-ARF model can effectively capture the underlying structure of the
+$`h`$-ARF model can effectively capture the underlying structure of the
 original data, including the correlation structure between features and
 the cluster structure of cells. In the supervised context, we showed
-that synthetic datasets generated by the {h}-ARF model can be used to
+that synthetic datasets generated by the $`h`$-ARF model can be used to
 train prediction models that achieve similar performance to those
 trained on original data. Therefore, offering a powerful tool for
 generating realistic synthetic datasets to improve prediction
