@@ -1,7 +1,6 @@
-#' Forest generator for high-dimensional data.
+#' High-dimensional adversarial random forest (h-ARF).
 #'
-#' The algorithm uses the high-dimensional arf model to generate synthetic
-#' data
+#' This function uses a high-dimensional ARF model to generate synthetic data.
 #'
 #' @param harf_obj A pre-trained harf model.
 #' @param n_synth Number of synthetic samples to generate.
@@ -26,10 +25,19 @@
 #' @returns A data.table containing the generated synthetic omics data.
 #' @importFrom foreach foreach %do% %dopar%
 #' @seealso \code{\link[arf]{forge}} for details on the forging process.
+#' @references
+#' \itemize{
+#'   \item Watson et al. (2023). Adversarial Random Forests.
+#'   Proceedings of the International Conference on Machine Learning (PMLR 206).
+#'   <https://proceedings.mlr.press/v206/watson23a.html>
+#'
+#'   \item Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
+#'   Submitted / under review. <Do not click>
+#' }
 #' @export
 #' @author Césaire Fouodo
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(single_cell)
 #' harf_model <- h_arf(
 #'   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],

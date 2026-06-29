@@ -19,6 +19,13 @@ knitr::opts_chunk$set(
 # install.packages("corrplot")
 # install.packages("doParallel")
 
+## ----numcore, echo=FALSE, include=FALSE---------------------------------------
+chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+num_cores <- if (nzchar(chk)) 1 else 2
+Sys.setenv(OMP_NUM_THREADS = num_cores)
+Sys.setenv(MKL_NUM_THREADS = num_cores)
+Sys.setenv(OPENBLAS_NUM_THREADS = num_cores)
+
 ## ----load_libraries, warning = FALSE, message = FALSE-------------------------
 library(harf)
 library(data.table)
@@ -29,11 +36,10 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
-# Register cores - Unix
 library(doParallel)
-registerDoParallel(cores = 2)
-# Set seed
-set.seed(12, "L'Ecuyer-CMRG")
+
+## ----numcore_lib, echo=FALSE, include=FALSE-----------------------------------
+data.table::setDTthreads(num_cores)
 
 ## ----single_cell_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE----
 data("single_cell")

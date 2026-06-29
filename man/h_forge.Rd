@@ -2,7 +2,7 @@
 % Please edit documentation in R/h_forge.R
 \name{h_forge}
 \alias{h_forge}
-\title{Forest generator for high-dimensional data.}
+\title{High-dimensional adversarial random forest (h-ARF).}
 \usage{
 h_forge(
   harf_obj,
@@ -53,11 +53,10 @@ See \code{forde} for details.}
 A data.table containing the generated synthetic omics data.
 }
 \description{
-The algorithm uses the high-dimensional arf model to generate synthetic
-data
+This function uses a high-dimensional ARF model to generate synthetic data.
 }
 \examples{
-\dontrun{
+\donttest{
 data(single_cell)
 harf_model <- h_arf(
   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
@@ -76,6 +75,16 @@ synth_single_cell <- h_forge(
      n_synth = sum(single_cell$cell_type == "lung"),
      evidence = data.frame(cell_type = "lung")
     )
+}
+}
+\references{
+\itemize{
+\item Watson et al. (2023). Adversarial Random Forests.
+Proceedings of the International Conference on Machine Learning (PMLR 206).
+\url{https://proceedings.mlr.press/v206/watson23a.html}
+
+\item Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
+Submitted / under review. \if{html}{\out{<Do not click>}}
 }
 }
 \seealso{

@@ -1,6 +1,6 @@
-#' High-dimensional Adversarial Random Forest (ARF) for omics and clinical data.
+#' High-dimensional adversarial random forest (h-ARF).
 #'
-#' The algorithm extends (ARF) to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits Adversarial Random Forest (ARF) models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
+#' This function extends the adversarial random forest (ARF) algorithm to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits ARF models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
 #'
 #' @param omx_data A data.frame containing omics data where rows represent samples (e.g. patients or cells) and columns represent features (e.g., gene or protein expressions).
 #' @param cli_lab_data A data.frame of clinical or laboratory data. For example, this may be a data.frame where rows represent cell types (for single cell data or additional clinical patient information, e.g. disease status, age, sex, BMI, etc).
@@ -32,9 +32,18 @@
 #' @importFrom RGCCA rgcca
 #' @importFrom foreach foreach %do% %dopar%
 #' @export
+#' @references
+#' \itemize{
+#'   \item Watson et al. (2023). Adversarial Random Forests.
+#'   Proceedings of the International Conference on Machine Learning (PMLR 206).
+#'   <https://proceedings.mlr.press/v206/watson23a.html>
+#'
+#'   \item Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
+#'   Submitted / under review. <Do not click>
+#' }
 #' @seealso [h_forge], [arf::adversarial_rf], [arf::forde]
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(single_cell)
 #' harf_model <- h_arf(
 #'   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],

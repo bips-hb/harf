@@ -58,6 +58,14 @@ install.packages("corrplot")
 install.packages("doParallel")
 ```
 
+```{r numcore, echo=FALSE, include=FALSE}
+chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+num_cores <- if (nzchar(chk)) 1 else 2
+Sys.setenv(OMP_NUM_THREADS = num_cores)
+Sys.setenv(MKL_NUM_THREADS = num_cores)
+Sys.setenv(OPENBLAS_NUM_THREADS = num_cores)
+```
+
 We load the required libraries.
 
 ```{r load_libraries, warning = FALSE, message = FALSE}
@@ -70,11 +78,11 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
-# Register cores - Unix
 library(doParallel)
-registerDoParallel(cores = 2)
-# Set seed
-set.seed(12, "L'Ecuyer-CMRG")
+```
+
+```{r numcore_lib, echo=FALSE, include=FALSE}
+data.table::setDTthreads(num_cores)
 ```
 
 In genetic epidemiology studies, molecular (omics) data are typically accompanied by clinical or phenotypic variables that provide essential contextual information. The *h*-ARF framework assumes that input data consist of two components: (i) high-dimensional numeric omics features and (ii) associated clinical or phenotypic variables, which may be mixed (categorical or numeric). In the following example, gene expression measurements are used as the omics data, while cell type serves as the labor information. Our first aim is to train a generative model to generate synthetic data that preserves the underlying structure of the original data, including the correlation structure between features and the cluster structure of cells.

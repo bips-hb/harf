@@ -2,7 +2,7 @@
 % Please edit documentation in R/h_arf.R
 \name{h_arf}
 \alias{h_arf}
-\title{High-dimensional Adversarial Random Forest (ARF) for omics and clinical data.}
+\title{High-dimensional adversarial random forest (h-ARF).}
 \usage{
 h_arf(
   omx_data,
@@ -72,10 +72,10 @@ h_arf(
 An isoARF object containing the fitted adversarial models, and clustering information.
 }
 \description{
-The algorithm extends (ARF) to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits Adversarial Random Forest (ARF) models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
+This function extends the adversarial random forest (ARF) algorithm to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits ARF models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
 }
 \examples{
-\dontrun{
+\donttest{
 data(single_cell)
 harf_model <- h_arf(
   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
@@ -94,6 +94,16 @@ synth_single_cell <- h_forge(
      n_synth = sum(single_cell$cell_type == "lung"),
      evidence = data.frame(cell_type = "lung")
     )
+}
+}
+\references{
+\itemize{
+\item Watson et al. (2023). Adversarial Random Forests.
+Proceedings of the International Conference on Machine Learning (PMLR 206).
+\url{https://proceedings.mlr.press/v206/watson23a.html}
+
+\item Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
+Submitted / under review. \if{html}{\out{<Do not click>}}
 }
 }
 \seealso{

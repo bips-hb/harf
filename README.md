@@ -74,8 +74,8 @@ browseVignettes("harf")
 ## References
 
 - Fouodo, C. J. K., Kapar, J. Huels A., Qin, S. Z. & Wright, M. N.
-  (2026). High-dimensional adversarial random forests. Submission. Link
-  [don’t click](https://arxiv.org/abs/2405.12345).
+  (2026). High-dimensional adversarial random forests. submitted for
+  peer review. Link [don’t click](https://arxiv.org/abs/2405.12345).
 
 - Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023).
   Adversarial random forests for density estimation and generative
