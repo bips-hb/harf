@@ -52,7 +52,7 @@ other isolated region by synthesized meta-observations. The *h*-ARF
 algorithm offers a flexible framework for unconditional and conditional
 data generation for downstream clustering and prediction analyses. The
 package includes a built-in single-cell RNA-seq datasets and TCGA-KICH
-dataset to illustrate its usage. We refer to the package vignette for
+dataset to illustrate its usage. We refer to the package [vignette](https://bips-hb.github.io/harf/articles/harf.html) for
 detailed examples and explanations.
 
 ## Package installation

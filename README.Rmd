@@ -28,7 +28,7 @@ Adversarial random forests (ARFs) have recently been introduced as a well-perfor
 
 While ARFs have demonstrated strong performance in various low-dimensional settings, their behavior in high-dimensional contexts, such as omics data, remains non investigated. The key assumption of ARFs — that feature distributions are independent within terminal nodes — may be violated in high-dimensional settings. For example, if a small subset of features is highly predictive of the synthetic response variable $y$, the remaining features not used to reach the terminal node may still be correlated, not allowing for marginal resampling. A typical resulting behaviour of ARF in such a situation is that the algorithm terminates without converging.
 
-The high-dimensional adversarial random forests (*h*-ARFs) package addresses the convergence issue of ARF by identifying isolated regions of the feature space in which the independence assumption is more likely to hold in terminal nodes. In addition, the *h*-ARF algorithm constructs a low-dimensional meta-space that captures the relationships among regions. Within each isolated region, separate ARFs are trained to better capture local data structures, followed by training additional ARF in a meta-region that capture the joint structure between isolated regions. To synthesize observations, the *h*-ARF algorithm first samples a region from the meta-space and then condition the resampling in the other isolated region by synthesized meta-observations. The *h*-ARF algorithm offers a flexible framework for unconditional and conditional data generation for downstream clustering and prediction analyses. The package includes a built-in single-cell RNA-seq datasets and TCGA-KICH dataset to illustrate its usage. We refer to the package vignette for detailed examples and explanations.
+The high-dimensional adversarial random forests (*h*-ARFs) package addresses the convergence issue of ARF by identifying isolated regions of the feature space in which the independence assumption is more likely to hold in terminal nodes. In addition, the *h*-ARF algorithm constructs a low-dimensional meta-space that captures the relationships among regions. Within each isolated region, separate ARFs are trained to better capture local data structures, followed by training additional ARF in a meta-region that capture the joint structure between isolated regions. To synthesize observations, the *h*-ARF algorithm first samples a region from the meta-space and then condition the resampling in the other isolated region by synthesized meta-observations. The *h*-ARF algorithm offers a flexible framework for unconditional and conditional data generation for downstream clustering and prediction analyses. The package includes a built-in single-cell RNA-seq datasets and TCGA-KICH dataset to illustrate its usage. We refer to the package [vignette](https://bips-hb.github.io/harf/articles/harf.html) for detailed examples and explanations.
 
 ## Package installation
 
@@ -37,7 +37,7 @@ The high-dimensional adversarial random forests (*h*-ARFs) package addresses the
 devtools::install_github("bips-hb/harf")
 ```
 
-Visit our vignette [here](https://bips-hb.github.io/harf/articles/harf.html) for detailed examples and explanations.
+Visit our [vignette](https://bips-hb.github.io/harf/articles/harf.html) for detailed examples and explanations.
 
 ## References
 
