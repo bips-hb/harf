@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 # install.packages("caret")
 # install.packages("ggplot2")
 # install.packages("corrplot")
+# install.packages("ranger")
 # install.packages("doParallel")
 
 ## ----set_par, echo=FALSE, include=FALSE---------------------------------------
@@ -62,6 +63,7 @@ library(corrplot)
 library(scater)
 library(pROC)
 library(caret)
+library(ranger)
 library(doParallel)
 
 ## ----numcore_lib, echo=FALSE, include=FALSE-----------------------------------
@@ -215,13 +217,6 @@ plot_corr(cond_synth_clustered, "Synthetic")
 par(mfrow = c(1, 1))
 plot_grid(sub_all_plots, sub_legend, ncol = 1, rel_heights = c(1, 0.2))
 par(mfrow = c(1, 1))
-
-## ----load_libraries_supervised, warning = FALSE, message = FALSE--------------
-library(data.table)
-library(pROC) # If not installed, use install.packages("pROC") to install it.
-library(caret) # If not installed, use install.packages("caret") to install it.
-library(ranger) # If not installed, use install.packages("ranger") to install it.
-seed <- 123
 
 ## ----kich_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
 data("kich")

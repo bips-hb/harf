@@ -436,7 +436,8 @@ tissue of origin for each cell.</p>
 <span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;caret&quot;</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
 <span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;corrplot&quot;</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;doParallel&quot;</span>)</span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ranger&quot;</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;doParallel&quot;</span>)</span></code></pre></div>
 <p>We load the required libraries.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(harf)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
@@ -449,7 +450,8 @@ tissue of origin for each cell.</p>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">library</span>(pROC)</span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code></pre></div>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code></pre></div>
 <p>In genetic epidemiology studies, molecular (omics) data are typically
 accompanied by clinical or phenotypic variables that provide essential
 contextual information. The <em>h</em>-ARF framework assumes that input
@@ -758,40 +760,34 @@ synthetic data will have a similar performance to the one trained on the
 original data, indicating that the <span class="math inline">\(h\)</span>-ARF model effectively captures the
 underlying structure of the original data and can be used to generate
 realistic synthetic datasets for prediction tasks.</p>
-<p>We set up the required libraries.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">library</span>(pROC) <span class="co"># If not installed, use install.packages(&quot;pROC&quot;) to install it.</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">library</span>(caret) <span class="co"># If not installed, use install.packages(&quot;caret&quot;) to install it.</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="fu">library</span>(ranger) <span class="co"># If not installed, use install.packages(&quot;ranger&quot;) to install it.</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">123</span></span></code></pre></div>
 <p>We load the <code>kich</code> dataset and create training and testing
 indices.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;kich&quot;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">123</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  kich<span class="sc">$</span>tumor_stage,</span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="at">p =</span> <span class="fl">0.7</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="at">list =</span> <span class="cn">FALSE</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>)</span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> train_idx[ , <span class="st">&quot;Resample1&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;kich&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">123</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  kich<span class="sc">$</span>tumor_stage,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="at">p =</span> <span class="fl">0.7</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  <span class="at">list =</span> <span class="cn">FALSE</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>)</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> train_idx[ , <span class="st">&quot;Resample1&quot;</span>]</span></code></pre></div>
 <p>We use the <code>ranger</code> package to train a random forest model
 on the original training data and evaluate its performance on the
 testing data.</p>
 <div id="prediction-model-trained-on-the-original-data" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Prediction model
 trained on the original data</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">ranger</span>(tumor_stage <span class="sc">~</span> .,</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>                   <span class="at">data =</span> kich[train_idx, ],</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>                   <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>                   <span class="at">probability =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># Estimate AUC on the test set</span></span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>test_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_model, <span class="at">data =</span> kich[<span class="sc">-</span>train_idx, ])<span class="sc">$</span>predictions</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>test_labels <span class="ot">&lt;-</span> kich<span class="sc">$</span>tumor_stage[<span class="sc">-</span>train_idx]</span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>auc_original <span class="ot">&lt;-</span> <span class="fu">roc</span>(test_labels, <span class="fu">as.numeric</span>(test_pred))<span class="sc">$</span>auc</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;AUC:&quot;</span>, auc_original))</span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AUC: 0.9375&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">ranger</span>(tumor_stage <span class="sc">~</span> .,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                   <span class="at">data =</span> kich[train_idx, ],</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                   <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>                   <span class="at">probability =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co"># Estimate AUC on the test set</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>test_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_model, <span class="at">data =</span> kich[<span class="sc">-</span>train_idx, ])<span class="sc">$</span>predictions</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>test_labels <span class="ot">&lt;-</span> kich<span class="sc">$</span>tumor_stage[<span class="sc">-</span>train_idx]</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>auc_original <span class="ot">&lt;-</span> <span class="fu">roc</span>(test_labels, <span class="fu">as.numeric</span>(test_pred))<span class="sc">$</span>auc</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;AUC:&quot;</span>, auc_original))</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AUC: 0.9375&quot;</span></span></code></pre></div>
 </div>
 <div id="supervised-adversarial-game" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Supervised
@@ -802,59 +798,59 @@ expression measurements are provided as the <code>omx_data</code>
 argument, and the binary outcome variable and addition variables
 including age and gender are passed as the <code>cli_lab_data</code>
 argument.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>kich_harf <span class="ot">&lt;-</span> <span class="fu">h_arf</span>(</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">omx_data =</span> kich[train_idx , <span class="sc">!</span>(<span class="fu">colnames</span>(kich) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;tumor_stage&quot;</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>                                                      <span class="st">&quot;age&quot;</span>, <span class="st">&quot;gender&quot;</span>))],</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                   <span class="at">cli_lab_data =</span> kich[train_idx, <span class="fu">c</span>(<span class="st">&quot;tumor_stage&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;gender&quot;</span>)],</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>                   <span class="at">chunk_size =</span> <span class="dv">10</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>                   <span class="at">target =</span> <span class="st">&quot;tumor_stage&quot;</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>                   <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>  )</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 40.22%</span></span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 47.87%</span></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 48.94%</span></span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 49.46%</span></span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 44.09%</span></span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 54.84%</span></span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 44.68%</span></span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 60.22%</span></span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 38.3%</span></span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 48.91%</span></span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 48.39%</span></span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 54.26%</span></span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 42.55%</span></span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 53.26%</span></span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 43.62%</span></span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 46.81%</span></span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 56.99%</span></span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 38.04%</span></span>
-<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 46.74%</span></span>
-<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
-<span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 40.86%</span></span>
-<span id="cb16-33"><a href="#cb16-33" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 44.68%</span></span>
-<span id="cb16-34"><a href="#cb16-34" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 59.57%</span></span>
-<span id="cb16-35"><a href="#cb16-35" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 34.41%</span></span>
-<span id="cb16-36"><a href="#cb16-36" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 53.19%</span></span>
-<span id="cb16-37"><a href="#cb16-37" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 55.91%</span></span>
-<span id="cb16-38"><a href="#cb16-38" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 47.83%</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>kich_harf <span class="ot">&lt;-</span> <span class="fu">h_arf</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="at">omx_data =</span> kich[train_idx , <span class="sc">!</span>(<span class="fu">colnames</span>(kich) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;tumor_stage&quot;</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>                                                      <span class="st">&quot;age&quot;</span>, <span class="st">&quot;gender&quot;</span>))],</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>                   <span class="at">cli_lab_data =</span> kich[train_idx, <span class="fu">c</span>(<span class="st">&quot;tumor_stage&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;gender&quot;</span>)],</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>                   <span class="at">chunk_size =</span> <span class="dv">10</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>                   <span class="at">target =</span> <span class="st">&quot;tumor_stage&quot;</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>                   <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>  )</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 40.22%</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 47.87%</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 48.94%</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 49.46%</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 44.09%</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 54.84%</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 44.68%</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 60.22%</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 38.3%</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 48.91%</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 48.39%</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 54.26%</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 42.55%</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 53.26%</span></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 43.62%</span></span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 46.81%</span></span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 56.99%</span></span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 38.04%</span></span>
+<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 46.74%</span></span>
+<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
+<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 40.86%</span></span>
+<span id="cb15-33"><a href="#cb15-33" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 44.68%</span></span>
+<span id="cb15-34"><a href="#cb15-34" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 59.57%</span></span>
+<span id="cb15-35"><a href="#cb15-35" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 34.41%</span></span>
+<span id="cb15-36"><a href="#cb15-36" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 53.19%</span></span>
+<span id="cb15-37"><a href="#cb15-37" tabindex="-1"></a><span class="co">#&gt; Iteration: 1, Accuracy: 55.91%</span></span>
+<span id="cb15-38"><a href="#cb15-38" tabindex="-1"></a><span class="co">#&gt; Iteration: 0, Accuracy: 47.83%</span></span></code></pre></div>
 </div>
 <div id="generating-synthetic-data-1" class="section level2" number="3.3">
 <h2><span class="header-section-number">3.3</span> Generating synthetic
 data</h2>
 <p>We now use the <code>h_forge</code> function to generate synthetic
 training dataset.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Synthetic data</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>synth_kich <span class="ot">&lt;-</span> <span class="fu">h_forge</span>(</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="at">harf_obj =</span> kich_harf,</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>  <span class="at">n_synth =</span> <span class="fu">length</span>(train_idx),</span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>  <span class="at">evidence =</span> <span class="cn">NULL</span>,</span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">parallel =</span> <span class="cn">FALSE</span></span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>)</span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>synth_kich <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(synth_kich)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Synthetic data</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>synth_kich <span class="ot">&lt;-</span> <span class="fu">h_forge</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="at">harf_obj =</span> kich_harf,</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  <span class="at">n_synth =</span> <span class="fu">length</span>(train_idx),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  <span class="at">evidence =</span> <span class="cn">NULL</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  <span class="at">parallel =</span> <span class="cn">FALSE</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>)</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>synth_kich <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(synth_kich)</span></code></pre></div>
 </div>
 <div id="prediction-model-trained-on-the-synthetic-data" class="section level2" number="3.4">
 <h2><span class="header-section-number">3.4</span> Prediction model
@@ -862,22 +858,22 @@ trained on the synthetic data</h2>
 <p>We train a prediction model on the synthetic training data and
 evaluate its performance on the testing data, the same testing data used
 to evaluate the model trained on the original data.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>rf_model_synth <span class="ot">&lt;-</span> <span class="fu">ranger</span>(tumor_stage <span class="sc">~</span> .,</span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>                          <span class="at">data =</span> synth_kich,</span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>                          <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>                          <span class="at">probability =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co"># Estimate AUC on the test set</span></span>
-<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>test_pred_synth <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_model_synth, <span class="at">data =</span> kich[<span class="sc">-</span>train_idx, ])<span class="sc">$</span>predictions</span>
-<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>auc_synth <span class="ot">&lt;-</span> <span class="fu">roc</span>(test_labels, <span class="fu">as.numeric</span>(test_pred_synth))<span class="sc">$</span>auc</span>
-<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>auc_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">&quot;Original&quot;</span>, <span class="st">&quot;Synthetic&quot;</span>),</span>
-<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>  <span class="at">AUC =</span> <span class="fu">c</span>(auc_original, auc_synth)</span>
-<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>)</span>
-<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="fu">print</span>(auc_comparison)</span>
-<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a><span class="co">#&gt;       Model       AUC</span></span>
-<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a><span class="co">#&gt; 1  Original 0.9375000</span></span>
-<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co">#&gt; 2 Synthetic 0.8465909</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>rf_model_synth <span class="ot">&lt;-</span> <span class="fu">ranger</span>(tumor_stage <span class="sc">~</span> .,</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                          <span class="at">data =</span> synth_kich,</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                          <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                          <span class="at">probability =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a><span class="co"># Estimate AUC on the test set</span></span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>test_pred_synth <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_model_synth, <span class="at">data =</span> kich[<span class="sc">-</span>train_idx, ])<span class="sc">$</span>predictions</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>auc_synth <span class="ot">&lt;-</span> <span class="fu">roc</span>(test_labels, <span class="fu">as.numeric</span>(test_pred_synth))<span class="sc">$</span>auc</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>auc_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">&quot;Original&quot;</span>, <span class="st">&quot;Synthetic&quot;</span>),</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>  <span class="at">AUC =</span> <span class="fu">c</span>(auc_original, auc_synth)</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>)</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="fu">print</span>(auc_comparison)</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;       Model       AUC</span></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt; 1  Original 0.9375000</span></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt; 2 Synthetic 0.8465909</span></span></code></pre></div>
 <p>As expected, the prediction model trained on the synthetic data has a
 similar performance to the one trained on the original data, indicating
 that the synthetic datasets can be used for prediction tasks. Our
