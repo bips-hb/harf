@@ -48,7 +48,7 @@ detailed examples and explanations.
 
 ``` r
 
-devtools::install_github("bips-hb/harf", build_vignettes  = TRUE)
+devtools::install_github("bips-hb/harf")
 ```
 
 Visit our vignette
