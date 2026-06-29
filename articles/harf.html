@@ -54,7 +54,7 @@
                         <h4 data-toc-skip class="author">Cesaire
 Fouodo</h4>
             
-            <h4 data-toc-skip class="date">2026-06-21</h4>
+            <h4 data-toc-skip class="date">2026-06-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/bips-hb/harf/blob/main/vignettes/harf.Rmd" class="external-link"><code>vignettes/harf.Rmd</code></a></small>
       <div class="d-none name"><code>harf.Rmd</code></div>
@@ -140,11 +140,7 @@ prostate, salivary gland, stomach, thyroid, and uterus. The variable
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot" class="external-link">corrplot</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/" class="external-link">scater</a></span><span class="op">)</span></span>
-<span><span class="co"># Register cores - Unix</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/doparallel" class="external-link">doParallel</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">registerDoParallel</a></span><span class="op">(</span>cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co"># Set seed</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span>, <span class="st">"L'Ecuyer-CMRG"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/doparallel" class="external-link">doParallel</a></span><span class="op">)</span></span></code></pre></div>
 <p>In genetic epidemiology studies, molecular (omics) data are typically
 accompanied by clinical or phenotypic variables that provide essential
 contextual information. The <em>h</em>-ARF framework assumes that input
@@ -185,59 +181,63 @@ runtime.</p>
 <span> chunk_size <span class="op">=</span> <span class="va">chunk_size</span>,</span>
 <span> verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 78.67%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.05%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 83.99%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.36%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.68%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 50.23%</span></span>
-<span><span class="co">#&gt; Iteration: 2, Accuracy: 46.76%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 82.95%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.27%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.75%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 50.72%</span></span>
-<span><span class="co">#&gt; Iteration: 2, Accuracy: 46.28%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.33%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.29%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 86.4%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 77.86%</span></span>
 <span><span class="co">#&gt; Iteration: 1, Accuracy: 45.87%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 80.58%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.95%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.89%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 50.34%</span></span>
-<span><span class="co">#&gt; Iteration: 2, Accuracy: 45.2%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 88.68%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 56.51%</span></span>
-<span><span class="co">#&gt; Iteration: 2, Accuracy: 46.5%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.89%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 49.08%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.46%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.24%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.18%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 52.91%</span></span>
-<span><span class="co">#&gt; Iteration: 2, Accuracy: 46.89%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 87.93%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 51.73%</span></span>
-<span><span class="co">#&gt; Iteration: 2, Accuracy: 45.03%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 82.82%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 49.15%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.08%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.64%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 87.08%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.28%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 86.56%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.4%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.36%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.34%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 82.59%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.35%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.9%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.96%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 82.84%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 46.07%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 86.93%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 51.44%</span></span>
+<span><span class="co">#&gt; Iteration: 2, Accuracy: 46.78%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 89.29%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 50.87%</span></span>
+<span><span class="co">#&gt; Iteration: 2, Accuracy: 47.28%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 87.25%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 53.55%</span></span>
+<span><span class="co">#&gt; Iteration: 2, Accuracy: 47.88%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.92%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.72%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 86.39%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.54%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 82.95%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.75%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.69%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.42%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 81.66%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 47.9%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 81.52%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 46.26%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 86.78%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 49.27%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 84.67%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 50.14%</span></span>
+<span><span class="co">#&gt; Iteration: 2, Accuracy: 45.39%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 85.79%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 52.05%</span></span>
+<span><span class="co">#&gt; Iteration: 2, Accuracy: 46.67%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 86.91%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 50.77%</span></span>
+<span><span class="co">#&gt; Iteration: 2, Accuracy: 45.71%</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">harf_model</span>,max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 10</span></span>
 <span><span class="co">#&gt;  $ meta_model       :List of 3</span></span>
 <span><span class="co">#&gt;  $ cor_matrix       : NULL</span></span>
-<span><span class="co">#&gt;  $ models           :List of 16</span></span>
+<span><span class="co">#&gt;  $ models           :List of 18</span></span>
 <span><span class="co">#&gt;  $ cluster          :'data.frame':   80 obs. of  2 variables:</span></span>
 <span><span class="co">#&gt;  $ meta_features    :'data.frame':   1652 obs. of  3 variables:</span></span>
 <span><span class="co">#&gt;  $ omx_features     : chr [1:80] "V1" "V2" "V3" "V4" ...</span></span>
 <span><span class="co">#&gt;  $ cli_lab_features : chr "cell_type"</span></span>
 <span><span class="co">#&gt;  $ omx_constant_data: NULL</span></span>
 <span><span class="co">#&gt;  $ feature_ordering : chr [1:81] "cell_type" "V1" "V2" "V3" ...</span></span>
-<span><span class="co">#&gt;  $ accuracy         : Named num [1:17] 0.44 0.484 0.468 0.473 0.463 ...</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:17] "meta_model" "cluster_2" "cluster_3" "cluster_4" ...</span></span>
+<span><span class="co">#&gt;  $ accuracy         : Named num [1:19] 0.459 0.474 0.483 0.474 0.48 ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:19] "meta_model" "cluster_2" "cluster_3" "cluster_6" ...</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr "harf"</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -505,7 +505,7 @@ testing data.</p>
 <span><span class="va">test_labels</span> <span class="op">&lt;-</span> <span class="va">kich</span><span class="op">$</span><span class="va">tumor_stage</span><span class="op">[</span><span class="op">-</span><span class="va">train_idx</span><span class="op">]</span></span>
 <span><span class="va">auc_original</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/pROC/man/roc.html" class="external-link">roc</a></span><span class="op">(</span><span class="va">test_labels</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">test_pred</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">auc</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"AUC:"</span>, <span class="va">auc_original</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "AUC: 0.875"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "AUC: 0.9375"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="supervised-adversarial-game">Supervised adversarial game<a class="anchor" aria-label="anchor" href="#supervised-adversarial-game"></a>
@@ -525,42 +525,34 @@ addition variables including age and gender are passed as the
 <span>                   target <span class="op">=</span> <span class="st">"tumor_stage"</span>,</span>
 <span>                   verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 43.01%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 48.39%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 48.39%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 35.56%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 41.49%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 51.65%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 39.13%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 58.51%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 38.71%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 56.38%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 36.56%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 55.91%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.68%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 61.7%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 32.98%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 56.99%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 42.55%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 54.35%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 40.86%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 55.91%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 35.48%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 51.06%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.57%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 54.95%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 38.3%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 51.61%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 41.94%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 56.38%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 34.78%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 40.22%</span></span>
 <span><span class="co">#&gt; Iteration: 0, Accuracy: 47.87%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 55.32%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 39.36%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 57.45%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 48.94%</span></span>
-<span><span class="co">#&gt; Iteration: 0, Accuracy: 56.52%</span></span>
-<span><span class="co">#&gt; Iteration: 1, Accuracy: 43.01%</span></span></code></pre></div>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 48.94%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 49.46%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.09%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 54.84%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.68%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 60.22%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 38.3%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 48.91%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 48.39%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 54.26%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 42.55%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 53.26%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 43.62%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 50.54%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 46.81%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 56.99%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 38.04%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 46.74%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 47.87%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 55.91%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 46.24%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 48.39%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 46.24%</span></span>
+<span><span class="co">#&gt; Iteration: 0, Accuracy: 55.43%</span></span>
+<span><span class="co">#&gt; Iteration: 1, Accuracy: 44.68%</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="generating-synthetic-data-1">Generating synthetic data<a class="anchor" aria-label="anchor" href="#generating-synthetic-data-1"></a>
@@ -598,9 +590,9 @@ to evaluate the model trained on the original data.</p>
 <span>  AUC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">auc_original</span>, <span class="va">auc_synth</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">auc_comparison</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       Model   AUC</span></span>
-<span><span class="co">#&gt; 1  Original 0.875</span></span>
-<span><span class="co">#&gt; 2 Synthetic 0.875</span></span></code></pre></div>
+<span><span class="co">#&gt;       Model       AUC</span></span>
+<span><span class="co">#&gt; 1  Original 0.9375000</span></span>
+<span><span class="co">#&gt; 2 Synthetic 0.8465909</span></span></code></pre></div>
 <p>As expected, the prediction model trained on the synthetic data has a
 similar performance to the one trained on the original data, indicating
 that the synthetic datasets can be used for prediction tasks. Our

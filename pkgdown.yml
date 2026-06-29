@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   harf: harf.html
-last_built: 2026-06-21T16:22Z
+last_built: 2026-06-29T04:33Z
 urls:
   reference: https://bips-hb.github.io/harf/reference
   article: https://bips-hb.github.io/harf/articles

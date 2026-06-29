@@ -68,11 +68,7 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
-# Register cores - Unix
 library(doParallel)
-registerDoParallel(cores = 2)
-# Set seed
-set.seed(12, "L'Ecuyer-CMRG")
 ```
 
 In genetic epidemiology studies, molecular (omics) data are typically
@@ -120,59 +116,63 @@ harf_model <- h_arf(
  chunk_size = chunk_size,
  verbose = TRUE
 )
-#> Iteration: 0, Accuracy: 78.67%
-#> Iteration: 1, Accuracy: 44.05%
-#> Iteration: 0, Accuracy: 83.99%
-#> Iteration: 1, Accuracy: 48.36%
-#> Iteration: 0, Accuracy: 85.68%
-#> Iteration: 1, Accuracy: 50.23%
-#> Iteration: 2, Accuracy: 46.76%
-#> Iteration: 0, Accuracy: 82.95%
-#> Iteration: 1, Accuracy: 47.27%
-#> Iteration: 0, Accuracy: 84.75%
-#> Iteration: 1, Accuracy: 50.72%
-#> Iteration: 2, Accuracy: 46.28%
-#> Iteration: 0, Accuracy: 84.33%
-#> Iteration: 1, Accuracy: 48.29%
-#> Iteration: 0, Accuracy: 86.4%
+#> Iteration: 0, Accuracy: 77.86%
 #> Iteration: 1, Accuracy: 45.87%
-#> Iteration: 0, Accuracy: 80.58%
-#> Iteration: 1, Accuracy: 44.95%
-#> Iteration: 0, Accuracy: 85.89%
-#> Iteration: 1, Accuracy: 50.34%
-#> Iteration: 2, Accuracy: 45.2%
-#> Iteration: 0, Accuracy: 88.68%
-#> Iteration: 1, Accuracy: 56.51%
-#> Iteration: 2, Accuracy: 46.5%
-#> Iteration: 0, Accuracy: 84.89%
-#> Iteration: 1, Accuracy: 49.08%
-#> Iteration: 0, Accuracy: 84.46%
-#> Iteration: 1, Accuracy: 47.24%
-#> Iteration: 0, Accuracy: 84.18%
-#> Iteration: 1, Accuracy: 52.91%
-#> Iteration: 2, Accuracy: 46.89%
-#> Iteration: 0, Accuracy: 87.93%
-#> Iteration: 1, Accuracy: 51.73%
-#> Iteration: 2, Accuracy: 45.03%
-#> Iteration: 0, Accuracy: 82.82%
-#> Iteration: 1, Accuracy: 49.15%
-#> Iteration: 0, Accuracy: 85.08%
-#> Iteration: 1, Accuracy: 48.64%
-#> Iteration: 0, Accuracy: 87.08%
-#> Iteration: 1, Accuracy: 48.28%
+#> Iteration: 0, Accuracy: 86.56%
+#> Iteration: 1, Accuracy: 47.4%
+#> Iteration: 0, Accuracy: 85.36%
+#> Iteration: 1, Accuracy: 48.34%
+#> Iteration: 0, Accuracy: 82.59%
+#> Iteration: 1, Accuracy: 47.35%
+#> Iteration: 0, Accuracy: 85.9%
+#> Iteration: 1, Accuracy: 47.96%
+#> Iteration: 0, Accuracy: 82.84%
+#> Iteration: 1, Accuracy: 46.07%
+#> Iteration: 0, Accuracy: 86.93%
+#> Iteration: 1, Accuracy: 51.44%
+#> Iteration: 2, Accuracy: 46.78%
+#> Iteration: 0, Accuracy: 89.29%
+#> Iteration: 1, Accuracy: 50.87%
+#> Iteration: 2, Accuracy: 47.28%
+#> Iteration: 0, Accuracy: 87.25%
+#> Iteration: 1, Accuracy: 53.55%
+#> Iteration: 2, Accuracy: 47.88%
+#> Iteration: 0, Accuracy: 84.92%
+#> Iteration: 1, Accuracy: 44.72%
+#> Iteration: 0, Accuracy: 86.39%
+#> Iteration: 1, Accuracy: 47.54%
+#> Iteration: 0, Accuracy: 82.95%
+#> Iteration: 1, Accuracy: 48.75%
+#> Iteration: 0, Accuracy: 85.69%
+#> Iteration: 1, Accuracy: 48.42%
+#> Iteration: 0, Accuracy: 81.66%
+#> Iteration: 1, Accuracy: 47.9%
+#> Iteration: 0, Accuracy: 81.52%
+#> Iteration: 1, Accuracy: 46.26%
+#> Iteration: 0, Accuracy: 86.78%
+#> Iteration: 1, Accuracy: 49.27%
+#> Iteration: 0, Accuracy: 84.67%
+#> Iteration: 1, Accuracy: 50.14%
+#> Iteration: 2, Accuracy: 45.39%
+#> Iteration: 0, Accuracy: 85.79%
+#> Iteration: 1, Accuracy: 52.05%
+#> Iteration: 2, Accuracy: 46.67%
+#> Iteration: 0, Accuracy: 86.91%
+#> Iteration: 1, Accuracy: 50.77%
+#> Iteration: 2, Accuracy: 45.71%
 str(harf_model,max.level = 1)
 #> List of 10
 #>  $ meta_model       :List of 3
 #>  $ cor_matrix       : NULL
-#>  $ models           :List of 16
+#>  $ models           :List of 18
 #>  $ cluster          :'data.frame':   80 obs. of  2 variables:
 #>  $ meta_features    :'data.frame':   1652 obs. of  3 variables:
 #>  $ omx_features     : chr [1:80] "V1" "V2" "V3" "V4" ...
 #>  $ cli_lab_features : chr "cell_type"
 #>  $ omx_constant_data: NULL
 #>  $ feature_ordering : chr [1:81] "cell_type" "V1" "V2" "V3" ...
-#>  $ accuracy         : Named num [1:17] 0.44 0.484 0.468 0.473 0.463 ...
-#>   ..- attr(*, "names")= chr [1:17] "meta_model" "cluster_2" "cluster_3" "cluster_4" ...
+#>  $ accuracy         : Named num [1:19] 0.459 0.474 0.483 0.474 0.48 ...
+#>   ..- attr(*, "names")= chr [1:19] "meta_model" "cluster_2" "cluster_3" "cluster_6" ...
 #>  - attr(*, "class")= chr "harf"
 ```
 
@@ -457,7 +457,7 @@ test_pred <- predict(rf_model, data = kich[-train_idx, ])$predictions
 test_labels <- kich$tumor_stage[-train_idx]
 auc_original <- roc(test_labels, as.numeric(test_pred))$auc
 print(paste("AUC:", auc_original))
-#> [1] "AUC: 0.875"
+#> [1] "AUC: 0.9375"
 ```
 
 ### Supervised adversarial game
@@ -479,42 +479,34 @@ kich_harf <- h_arf(
                    target = "tumor_stage",
                    verbose = TRUE
   )
-#> Iteration: 0, Accuracy: 43.01%
-#> Iteration: 0, Accuracy: 48.39%
-#> Iteration: 0, Accuracy: 48.39%
-#> Iteration: 0, Accuracy: 35.56%
-#> Iteration: 0, Accuracy: 41.49%
-#> Iteration: 0, Accuracy: 51.65%
-#> Iteration: 1, Accuracy: 39.13%
-#> Iteration: 0, Accuracy: 58.51%
-#> Iteration: 1, Accuracy: 38.71%
-#> Iteration: 0, Accuracy: 56.38%
-#> Iteration: 1, Accuracy: 36.56%
-#> Iteration: 0, Accuracy: 55.91%
-#> Iteration: 1, Accuracy: 44.68%
-#> Iteration: 0, Accuracy: 61.7%
-#> Iteration: 1, Accuracy: 32.98%
-#> Iteration: 0, Accuracy: 56.99%
-#> Iteration: 1, Accuracy: 42.55%
-#> Iteration: 0, Accuracy: 54.35%
-#> Iteration: 1, Accuracy: 40.86%
-#> Iteration: 0, Accuracy: 55.91%
-#> Iteration: 1, Accuracy: 35.48%
-#> Iteration: 0, Accuracy: 51.06%
-#> Iteration: 1, Accuracy: 44.57%
-#> Iteration: 0, Accuracy: 54.95%
-#> Iteration: 1, Accuracy: 38.3%
-#> Iteration: 0, Accuracy: 51.61%
-#> Iteration: 1, Accuracy: 41.94%
-#> Iteration: 0, Accuracy: 56.38%
-#> Iteration: 1, Accuracy: 34.78%
+#> Iteration: 0, Accuracy: 40.22%
 #> Iteration: 0, Accuracy: 47.87%
-#> Iteration: 0, Accuracy: 55.32%
-#> Iteration: 1, Accuracy: 39.36%
-#> Iteration: 0, Accuracy: 57.45%
-#> Iteration: 1, Accuracy: 48.94%
-#> Iteration: 0, Accuracy: 56.52%
-#> Iteration: 1, Accuracy: 43.01%
+#> Iteration: 0, Accuracy: 48.94%
+#> Iteration: 0, Accuracy: 49.46%
+#> Iteration: 0, Accuracy: 50.54%
+#> Iteration: 1, Accuracy: 44.09%
+#> Iteration: 0, Accuracy: 54.84%
+#> Iteration: 1, Accuracy: 44.68%
+#> Iteration: 0, Accuracy: 60.22%
+#> Iteration: 1, Accuracy: 38.3%
+#> Iteration: 0, Accuracy: 48.91%
+#> Iteration: 0, Accuracy: 48.39%
+#> Iteration: 0, Accuracy: 54.26%
+#> Iteration: 1, Accuracy: 42.55%
+#> Iteration: 0, Accuracy: 53.26%
+#> Iteration: 1, Accuracy: 43.62%
+#> Iteration: 0, Accuracy: 50.54%
+#> Iteration: 1, Accuracy: 46.81%
+#> Iteration: 0, Accuracy: 56.99%
+#> Iteration: 1, Accuracy: 38.04%
+#> Iteration: 0, Accuracy: 46.74%
+#> Iteration: 0, Accuracy: 47.87%
+#> Iteration: 0, Accuracy: 55.91%
+#> Iteration: 1, Accuracy: 46.24%
+#> Iteration: 0, Accuracy: 48.39%
+#> Iteration: 0, Accuracy: 46.24%
+#> Iteration: 0, Accuracy: 55.43%
+#> Iteration: 1, Accuracy: 44.68%
 ```
 
 ### Generating synthetic data
@@ -556,9 +548,9 @@ auc_comparison <- data.frame(
   AUC = c(auc_original, auc_synth)
 )
 print(auc_comparison)
-#>       Model   AUC
-#> 1  Original 0.875
-#> 2 Synthetic 0.875
+#>       Model       AUC
+#> 1  Original 0.9375000
+#> 2 Synthetic 0.8465909
 ```
 
 As expected, the prediction model trained on the synthetic data has a

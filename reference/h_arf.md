@@ -1,10 +1,10 @@
-# High-dimensional Adversarial Random Forest (ARF) for omics and clinical data.
+# High-dimensional adversarial random forest (h-ARF).
 
-The algorithm extends (ARF) to high-dimensional settings. It partitions
-high-dimensional data into isolated regions and fits Adversarial Random
-Forest (ARF) models within each region and on a latent space
-representing region joint distribution to capture within and between
-region feature dependencies.
+This function extends the adversarial random forest (ARF) algorithm to
+high-dimensional settings. It partitions high-dimensional data into
+isolated regions and fits ARF models within each region and on a latent
+space representing region joint distribution to capture within and
+between region feature dependencies.
 
 ## Usage
 
@@ -153,6 +153,15 @@ h_arf(
 An isoARF object containing the fitted adversarial models, and
 clustering information.
 
+## References
+
+- Watson et al. (2023). Adversarial Random Forests. Proceedings of the
+  International Conference on Machine Learning (PMLR 206).
+  <https://proceedings.mlr.press/v206/watson23a.html>
+
+- Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
+  Submitted / under review.
+
 ## See also
 
 [h_forge](https://bips-hb.github.io/harf/reference/h_forge.md),
@@ -162,7 +171,7 @@ clustering information.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 data(single_cell)
 harf_model <- h_arf(
   omx_data = single_cell[ , - which(colnames(single_cell)  == "cell_type")],
@@ -174,6 +183,18 @@ synth_single_cell <- h_forge(
  harf_obj = harf_model,
  n_synth = nrow(single_cell)
  )
+#> Generating synthetic data for cluster 1 out of 12...
+#> Generating synthetic data for cluster 2 out of 12...
+#> Generating synthetic data for cluster 3 out of 12...
+#> Generating synthetic data for cluster 4 out of 12...
+#> Generating synthetic data for cluster 5 out of 12...
+#> Generating synthetic data for cluster 6 out of 12...
+#> Generating synthetic data for cluster 7 out of 12...
+#> Generating synthetic data for cluster 8 out of 12...
+#> Generating synthetic data for cluster 9 out of 12...
+#> Generating synthetic data for cluster 10 out of 12...
+#> Generating synthetic data for cluster 11 out of 12...
+#> Generating synthetic data for cluster 12 out of 12...
  # Conditional resampling from harf_model
  set.seed(142)
  lung_single_cell <- h_forge(
@@ -181,5 +202,17 @@ synth_single_cell <- h_forge(
      n_synth = sum(single_cell$cell_type == "lung"),
      evidence = data.frame(cell_type = "lung")
     )
-} # }
+#> Generating synthetic data for cluster 1 out of 12...
+#> Generating synthetic data for cluster 2 out of 12...
+#> Generating synthetic data for cluster 3 out of 12...
+#> Generating synthetic data for cluster 4 out of 12...
+#> Generating synthetic data for cluster 5 out of 12...
+#> Generating synthetic data for cluster 6 out of 12...
+#> Generating synthetic data for cluster 7 out of 12...
+#> Generating synthetic data for cluster 8 out of 12...
+#> Generating synthetic data for cluster 9 out of 12...
+#> Generating synthetic data for cluster 10 out of 12...
+#> Generating synthetic data for cluster 11 out of 12...
+#> Generating synthetic data for cluster 12 out of 12...
+# }
 ```
