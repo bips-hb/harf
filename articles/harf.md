@@ -54,6 +54,7 @@ install.packages("pROC")
 install.packages("caret")
 install.packages("ggplot2")
 install.packages("corrplot")
+install.packages("ranger")
 install.packages("doParallel")
 ```
 
@@ -72,6 +73,7 @@ library(corrplot)
 library(scater)
 library(pROC)
 library(caret)
+library(ranger)
 library(doParallel)
 ```
 
@@ -418,17 +420,6 @@ on the synthetic data will have a similar performance to the one trained
 on the original data, indicating that the $`h`$-ARF model effectively
 captures the underlying structure of the original data and can be used
 to generate realistic synthetic datasets for prediction tasks.
-
-We set up the required libraries.
-
-``` r
-
-library(data.table)
-library(pROC) # If not installed, use install.packages("pROC") to install it.
-library(caret) # If not installed, use install.packages("caret") to install it.
-library(ranger) # If not installed, use install.packages("ranger") to install it.
-seed <- 123
-```
 
 We load the `kich` dataset and create training and testing indices.
 

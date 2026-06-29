@@ -131,6 +131,7 @@ prostate, salivary gland, stomach, thyroid, and uterus. The variable
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"caret"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggplot2"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"corrplot"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"doParallel"</span><span class="op">)</span></span></code></pre></div>
 <p>We load the required libraries.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -145,6 +146,7 @@ prostate, salivary gland, stomach, thyroid, and uterus. The variable
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/" class="external-link">scater</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://xrobin.github.io/pROC/" class="external-link">pROC</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/" class="external-link">caret</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://imbs-hl.github.io/ranger/" class="external-link">ranger</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/doparallel" class="external-link">doParallel</a></span><span class="op">)</span></span></code></pre></div>
 <p>In genetic epidemiology studies, molecular (omics) data are typically
 accompanied by clinical or phenotypic variables that provide essential
@@ -489,16 +491,9 @@ trained on the original data, indicating that the
 model effectively captures the underlying structure of the original data
 and can be used to generate realistic synthetic datasets for prediction
 tasks.</p>
-<p>We set up the required libraries.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://xrobin.github.io/pROC/" class="external-link">pROC</a></span><span class="op">)</span> <span class="co"># If not installed, use install.packages("pROC") to install it.</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/" class="external-link">caret</a></span><span class="op">)</span> <span class="co"># If not installed, use install.packages("caret") to install it.</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://imbs-hl.github.io/ranger/" class="external-link">ranger</a></span><span class="op">)</span> <span class="co"># If not installed, use install.packages("ranger") to install it.</span></span>
-<span><span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">123</span></span></code></pre></div>
 <p>We load the <code>kich</code> dataset and create training and testing
 indices.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"kich"</span><span class="op">)</span></span>
 <span><span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">123</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
@@ -514,7 +509,7 @@ testing data.</p>
 <div class="section level3">
 <h3 id="prediction-model-trained-on-the-original-data">Prediction model trained on the original data<a class="anchor" aria-label="anchor" href="#prediction-model-trained-on-the-original-data"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
 <span><span class="va">rf_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">tumor_stage</span> <span class="op">~</span> <span class="va">.</span>,</span>
 <span>                   data <span class="op">=</span> <span class="va">kich</span><span class="op">[</span><span class="va">train_idx</span>, <span class="op">]</span>,</span>
@@ -537,7 +532,7 @@ the gene expression measurements are provided as the
 <code>omx_data</code> argument, and the binary outcome variable and
 addition variables including age and gender are passed as the
 <code>cli_lab_data</code> argument.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
 <span><span class="va">kich_harf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/h_arf.html">h_arf</a></span><span class="op">(</span></span>
 <span>  omx_data <span class="op">=</span> <span class="va">kich</span><span class="op">[</span><span class="va">train_idx</span> , <span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">kich</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tumor_stage"</span>,</span>
@@ -581,7 +576,7 @@ addition variables including age and gender are passed as the
 </h3>
 <p>We now use the <code>h_forge</code> function to generate synthetic
 training dataset.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Synthetic data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
 <span><span class="va">synth_kich</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/h_forge.html">h_forge</a></span><span class="op">(</span></span>
@@ -598,7 +593,7 @@ training dataset.</p>
 <p>We train a prediction model on the synthetic training data and
 evaluate its performance on the testing data, the same testing data used
 to evaluate the model trained on the original data.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
 <span><span class="va">rf_model_synth</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">tumor_stage</span> <span class="op">~</span> <span class="va">.</span>,</span>
 <span>                          data <span class="op">=</span> <span class="va">synth_kich</span>,</span>
