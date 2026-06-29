@@ -15,16 +15,40 @@ knitr::opts_chunk$set(
 #   install.packages("BiocManager")
 # BiocManager::install("SingleCellExperiment")
 # BiocManager::install("scater")
+# install.packages("pROC")
+# install.packages("caret")
 # install.packages("ggplot2")
 # install.packages("corrplot")
 # install.packages("doParallel")
 
-## ----numcore, echo=FALSE, include=FALSE---------------------------------------
+## ----set_par, echo=FALSE, include=FALSE---------------------------------------
+# Save graphics parameters properly
+old_par <- par(no.readonly = TRUE)
+on.exit(par(old_par), add = TRUE)
+
+# Save environment variables
+old_env <- Sys.getenv(c("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+
+on.exit({
+  Sys.setenv(
+    OMP_NUM_THREADS = old_env[1],
+    MKL_NUM_THREADS = old_env[2],
+    OPENBLAS_NUM_THREADS = old_env[3]
+  )
+}, add = TRUE)
+
+# Set safe CRAN-recommended thread limits
 chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 num_cores <- if (nzchar(chk)) 1 else 2
-Sys.setenv(OMP_NUM_THREADS = num_cores)
-Sys.setenv(MKL_NUM_THREADS = num_cores)
-Sys.setenv(OPENBLAS_NUM_THREADS = num_cores)
+
+Sys.setenv(
+  OMP_NUM_THREADS = num_cores,
+  MKL_NUM_THREADS = num_cores,
+  OPENBLAS_NUM_THREADS = num_cores
+)
+
+# Ensure default layout (optional but safe)
+par(mfrow = c(1, 1))
 
 ## ----load_libraries, warning = FALSE, message = FALSE-------------------------
 library(harf)
@@ -36,6 +60,8 @@ library(SingleCellExperiment)
 library(ggplot2)
 library(corrplot)
 library(scater)
+library(pROC)
+library(caret)
 library(doParallel)
 
 ## ----numcore_lib, echo=FALSE, include=FALSE-----------------------------------
@@ -199,6 +225,7 @@ seed <- 123
 
 ## ----kich_example, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE------
 data("kich")
+seed <- 123
 set.seed(seed)
 train_idx <- caret::createDataPartition(
   kich$tumor_stage,
@@ -255,4 +282,7 @@ auc_comparison <- data.frame(
   AUC = c(auc_original, auc_synth)
 )
 print(auc_comparison)
+
+## ----reset_par, echo=FALSE, include=FALSE-------------------------------------
+par(old_par)
 

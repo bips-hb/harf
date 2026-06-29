@@ -12,7 +12,7 @@
 
 <meta name="author" content="Cesaire Fouodo" />
 
-<meta name="date" content="2026-06-21" />
+<meta name="date" content="2026-06-29" />
 
 <title>How does harf work?</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">How does harf work?</h1>
 <h4 class="author">Cesaire Fouodo</h4>
-<h4 class="date">2026-06-21</h4>
+<h4 class="date">2026-06-29</h4>
 
 
 <div id="TOC">
@@ -352,8 +352,7 @@ process</a>
 <ul>
 <li><a href="#high-dimensional-adversarial-game" id="toc-high-dimensional-adversarial-game"><span class="toc-section-number">2.1</span> High-dimensional adversarial
 game</a></li>
-<li><a href="#inspect-accuracy-of-the-h-arf-model" id="toc-inspect-accuracy-of-the-h-arf-model"><span class="toc-section-number">2.2</span> Inspect accuracy of the {h}-ARF
-model</a></li>
+<li><a href="#inspect-accuracy-of-the-h-arf-model" id="toc-inspect-accuracy-of-the-h-arf-model"><span class="toc-section-number">2.2</span> Inspect accuracy of the <span class="math inline">\(h\)</span>-ARF model</a></li>
 <li><a href="#generating-synthetic-data" id="toc-generating-synthetic-data"><span class="toc-section-number">2.3</span> Generating synthetic data</a></li>
 <li><a href="#comparaison-of-correlation-matrices" id="toc-comparaison-of-correlation-matrices"><span class="toc-section-number">2.4</span> Comparaison of correlation
 matrices</a></li>
@@ -392,17 +391,17 @@ max-height: 400px;
 forests (ARFs) to high-dimensional data. This vignette serves as a user
 guide to use the package effectively. Two key functionalities are
 provided: <code>h_arf</code> to train and estimate densities in a
-high-dimensional adversarial random forest ({h}-ARF), and
-<code>h_forge</code> for the synthetic data generating process.
-Unconditional and conditional data generating processes are supported.
-The package is designed to handle high-dimensional omics data, such as
-gene expression measurements, and can be applied to various downstream
-analyses, including clustering (unsupervised) and classification to
-generate synthetic data (supervised). For clustering, we illustrate the
-usage of the <strong>harf</strong> package using a single-cell RNA-seq
-dataset, where the goal is to generate synthetic data that preserves the
-underlying structure of the original data. For prediction, illustration
-is made based on gene expression data, with the goal to synthesize gene
+high-dimensional adversarial random forest (<span class="math inline">\(h\)</span>-ARF), and <code>h_forge</code> for the
+synthetic data generating process. Unconditional and conditional data
+generating processes are supported. The package is designed to handle
+high-dimensional omics data, such as gene expression measurements, and
+can be applied to various downstream analyses, including clustering
+(unsupervised) and classification to generate synthetic data
+(supervised). For clustering, we illustrate the usage of the
+<strong>harf</strong> package using a single-cell RNA-seq dataset, where
+the goal is to generate synthetic data that preserves the underlying
+structure of the original data. For prediction, illustration is made
+based on gene expression data, with the goal to synthesize gene
 expression data that can be used to assess the performance of a
 prediction models in the absence of original datasets. Such a situation
 typically arise when research face sample size limitation and do not
@@ -433,9 +432,11 @@ tissue of origin for each cell.</p>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;SingleCellExperiment&quot;</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">&quot;scater&quot;</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;corrplot&quot;</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;doParallel&quot;</span>)</span></code></pre></div>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;pROC&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;caret&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;corrplot&quot;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;doParallel&quot;</span>)</span></code></pre></div>
 <p>We load the required libraries.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(harf)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
@@ -446,7 +447,9 @@ tissue of origin for each cell.</p>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code></pre></div>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">library</span>(pROC)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code></pre></div>
 <p>In genetic epidemiology studies, molecular (omics) data are typically
 accompanied by clinical or phenotypic variables that provide essential
 contextual information. The <em>h</em>-ARF framework assumes that input
@@ -466,15 +469,15 @@ a given performance measure.</p>
 <div id="high-dimensional-adversarial-game" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> High-dimensional
 adversarial game</h2>
-<p>We train a {h}-ARF model using the <code>h_arf</code> function. The
-gene expression measurements are provided as the <code>omx_data</code>
-argument, while the cell type information is passed as the
-<code>cli_lab_data</code> argument. We set the maximal chunk size to 5,
-to specify that maximal number of features allowed in an isolated
-region. This parameter is crucial for three main aspects, including (i)
-controlling the convergence of ARF in the isolated regions, (ii)
-learning the joint pattern between features, and (iii) managing the
-runtime.</p>
+<p>We train a <span class="math inline">\(h\)</span>-ARF model using the
+<code>h_arf</code> function. The gene expression measurements are
+provided as the <code>omx_data</code> argument, while the cell type
+information is passed as the <code>cli_lab_data</code> argument. We set
+the maximal chunk size to 5, to specify that maximal number of features
+allowed in an isolated region. This parameter is crucial for three main
+aspects, including (i) controlling the convergence of ARF in the
+isolated regions, (ii) learning the joint pattern between features, and
+(iii) managing the runtime.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>my_omx_data <span class="ot">&lt;-</span> single_cell[ , <span class="sc">-</span> <span class="fu">which</span>(<span class="fu">colnames</span>(single_cell)  <span class="sc">==</span> <span class="st">&quot;cell_type&quot;</span>)]</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>my_cli_lab_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">cell_type =</span> single_cell<span class="sc">$</span>cell_type)</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>harf_model <span class="ot">&lt;-</span> <span class="fu">h_arf</span>(</span>
@@ -546,8 +549,8 @@ runtime.</p>
 </div>
 <div id="inspect-accuracy-of-the-h-arf-model" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Inspect accuracy of
-the {h}-ARF model</h2>
-<p>We plot the accuracy of the {h}-ARF model across the training regions
+the <span class="math inline">\(h\)</span>-ARF model</h2>
+<p>We plot the accuracy of the <span class="math inline">\(h\)</span>-ARF model across the training regions
 and the meta region to ensure that the adversarial game has converged
 properly. An accuracy lesser than <span class="math inline">\(0.5\)</span> indicates that the ARF model locally
 converged, i.e. it stopped because it had not been able to distinguish
@@ -575,10 +578,11 @@ that the local ARF model converge.</p>
 <h2><span class="header-section-number">2.3</span> Generating synthetic
 data</h2>
 <p>We use the <code>h_forge</code> function to generate sznthsize single
-cell data using the trained {h}-ARF model. Here, we generate the same
-number of synthetic samples as in the original dataset, and without any
-evidence, i.e. without any prio information regarding the the single
-cell classes (<code>evidence = NULL</code>). As we will see later, the
+cell data using the trained <span class="math inline">\(h\)</span>-ARF
+model. Here, we generate the same number of synthetic samples as in the
+original dataset, and without any evidence, i.e. without any prio
+information regarding the the single cell classes
+(<code>evidence = NULL</code>). As we will see later, the
 <code>evidence</code> argument can be used to generate synthetic data
 conditionally on a specific cell types. The generated synthetic data are
 stored in the <code>synth_single_cell</code> object.</p>
@@ -596,10 +600,10 @@ stored in the <code>synth_single_cell</code> object.</p>
 correlation matrices</h2>
 <p>We visually compare the correlation matrices of the original data and
 the synthetic data. To enhance interpretability, we rearrange the
-features according to their region assignments obtained from the {h}-ARF
-model. The correlation plots exhibit similar patterns across the three
-datasets, indicating that the {h}-ARF model effectively preserve the
-origin feature correlation structure.</p>
+features according to their region assignments obtained from the <span class="math inline">\(h\)</span>-ARF model. The correlation plots
+exhibit similar patterns across the three datasets, indicating that the
+<span class="math inline">\(h\)</span>-ARF model effectively preserve
+the origin feature correlation structure.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Re-arrange data by grouping gene by clusters</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>cluster_feature <span class="ot">&lt;-</span> <span class="fu">copy</span>(harf_model<span class="sc">$</span>cluster)</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">setorder</span>(cluster_feature, cluster)</span>
@@ -620,8 +624,8 @@ origin feature correlation structure.</p>
 synthetic data in 2D using t-SNE</h2>
 <p>We use t-SNE to visualize cells in a two-dimensional space. Original
 cell clusters are preserved in the synthetic data, indicating that the
-{h}-ARF model effectively captures the underlying cluster structure of
-the original data.</p>
+<span class="math inline">\(h\)</span>-ARF model effectively captures
+the underlying cluster structure of the original data.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>tsne_it <span class="ot">&lt;-</span> <span class="cf">function</span> (sc_data, <span class="at">perp =</span> <span class="dv">30</span>, <span class="at">title =</span> <span class="st">&quot;&quot;</span>) {</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="co"># Create SingleCellExperiment object</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  sce <span class="ot">&lt;-</span> SingleCellExperiment<span class="sc">::</span><span class="fu">SingleCellExperiment</span>(</span>
@@ -736,26 +740,24 @@ gender as additional clinical variables. We scale gene expressions and
 age. To create the response variable, we fix age and the first <span class="math inline">\(10\)</span> gene expression variables to drive an
 effect. We set the effect of age to <span class="math inline">\(0.5\)</span>, and draw the effects of gene
 expressions uniformly from interval <span class="math inline">\([-1,
-1]\)</span>. Subsequently, we train a {h}-ARF model using the
-<code>h_arf</code> function on the training data, where the gene
-expression measurements are provided as the <code>omx_data</code>
-argument, and the binary outcome variable and addition variables
-including age and gender (<span class="math inline">\(27\)</span> males
-and <span class="math inline">\(39\)</span> females) are passed as the
+1]\)</span>. Subsequently, we train a <span class="math inline">\(h\)</span>-ARF model using the <code>h_arf</code>
+function on the training data, where the gene expression measurements
+are provided as the <code>omx_data</code> argument, and the binary
+outcome variable and addition variables including age and gender (<span class="math inline">\(27\)</span> males and <span class="math inline">\(39\)</span> females) are passed as the
 <code>cli_lab_data</code> argument. We also specify the target variable
 using the parameter <code>target</code>. We set the maximal chunk size
 to <span class="math inline">\(10\)</span>, to specify the maximal
 number of features allowed in an isolated region. After training the
-{h}-ARF model, we use the <code>h_forge</code> function to generate
-synthetic training dataset. We then train a prediction model, on the
-original and the synthetic training data and evaluate their performances
-a common testing data. We report the area Receiver Operating
-Characteristic (ROC) curve (AUC) as performance metric. We expect that
-the prediction model trained on the synthetic data will have a similar
-performance to the one trained on the original data, indicating that the
-{h}-ARF model effectively captures the underlying structure of the
-original data and can be used to generate realistic synthetic datasets
-for prediction tasks.</p>
+<span class="math inline">\(h\)</span>-ARF model, we use the
+<code>h_forge</code> function to generate synthetic training dataset. We
+then train a prediction model, on the original and the synthetic
+training data and evaluate their performances a common testing data. We
+report the area Receiver Operating Characteristic (ROC) curve (AUC) as
+performance metric. We expect that the prediction model trained on the
+synthetic data will have a similar performance to the one trained on the
+original data, indicating that the <span class="math inline">\(h\)</span>-ARF model effectively captures the
+underlying structure of the original data and can be used to generate
+realistic synthetic datasets for prediction tasks.</p>
 <p>We set up the required libraries.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">library</span>(pROC) <span class="co"># If not installed, use install.packages(&quot;pROC&quot;) to install it.</span></span>
@@ -765,13 +767,14 @@ for prediction tasks.</p>
 <p>We load the <code>kich</code> dataset and create training and testing
 indices.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;kich&quot;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  kich<span class="sc">$</span>tumor_stage,</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="at">p =</span> <span class="fl">0.7</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="at">list =</span> <span class="cn">FALSE</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>)</span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> train_idx[ , <span class="st">&quot;Resample1&quot;</span>]</span></code></pre></div>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">123</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  kich<span class="sc">$</span>tumor_stage,</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="at">p =</span> <span class="fl">0.7</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="at">list =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>)</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> train_idx[ , <span class="st">&quot;Resample1&quot;</span>]</span></code></pre></div>
 <p>We use the <code>ranger</code> package to train a random forest model
 on the original training data and evaluate its performance on the
 testing data.</p>
@@ -793,11 +796,12 @@ trained on the original data</h2>
 <div id="supervised-adversarial-game" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Supervised
 adversarial game</h2>
-<p>We train a {h}-ARF model using the <code>h_arf</code> function on the
-training data, where the gene expression measurements are provided as
-the <code>omx_data</code> argument, and the binary outcome variable and
-addition variables including age and gender are passed as the
-<code>cli_lab_data</code> argument.</p>
+<p>We train a <span class="math inline">\(h\)</span>-ARF model using the
+<code>h_arf</code> function on the training data, where the gene
+expression measurements are provided as the <code>omx_data</code>
+argument, and the binary outcome variable and addition variables
+including age and gender are passed as the <code>cli_lab_data</code>
+argument.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>kich_harf <span class="ot">&lt;-</span> <span class="fu">h_arf</span>(</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">omx_data =</span> kich[train_idx , <span class="sc">!</span>(<span class="fu">colnames</span>(kich) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;tumor_stage&quot;</span>,</span>
@@ -891,14 +895,15 @@ framework to effectively handle high-dimensional omics data and supports
 both unconditional and conditional data generation. We have illustrated
 the usage of the package in both unsupervised and supervised downstream
 analysis contexts. In the unsupervised context, we demonstrated that the
-{h}-ARF model can effectively capture the underlying structure of the
-original data, including the correlation structure between features and
-the cluster structure of cells. In the supervised context, we showed
-that synthetic datasets generated by the {h}-ARF model can be used to
-train prediction models that achieve similar performance to those
-trained on original data. Therefore, offering a powerful tool for
-generating realistic synthetic datasets to improve prediction
-performance in case of lack of training datasets.</p>
+<span class="math inline">\(h\)</span>-ARF model can effectively capture
+the underlying structure of the original data, including the correlation
+structure between features and the cluster structure of cells. In the
+supervised context, we showed that synthetic datasets generated by the
+<span class="math inline">\(h\)</span>-ARF model can be used to train
+prediction models that achieve similar performance to those trained on
+original data. Therefore, offering a powerful tool for generating
+realistic synthetic datasets to improve prediction performance in case
+of lack of training datasets.</p>
 </div>
 <div id="references" class="section level2" number="3.6">
 <h2><span class="header-section-number">3.6</span> References</h2>
