@@ -37,15 +37,7 @@ The high-dimensional adversarial random forests (*h*-ARFs) package addresses the
 devtools::install_github("bips-hb/harf", build_vignettes  = TRUE)
 ```
 
-```{r example, include = TRUE, eval = FALSE}
-vignette("harf")
-```
-
-Vignette on browser
-
-```{r vignetteb, include = TRUE, eval = FALSE}
-browseVignettes("harf")
-```
+Visit our vignette [here](https://bips-hb.github.io/harf/articles/harf.html) for detailed examples and explanations.
 
 ## References
 

@@ -61,15 +61,9 @@ detailed examples and explanations.
 devtools::install_github("bips-hb/harf", build_vignettes  = TRUE)
 ```
 
-``` r
-vignette("harf")
-```
-
-Vignette on browser
-
-``` r
-browseVignettes("harf")
-```
+Visit our vignette
+[here](https://bips-hb.github.io/harf/articles/harf.html) for detailed
+examples and explanations.
 
 ## References
 
