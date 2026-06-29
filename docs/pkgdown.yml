@@ -1,0 +1,9 @@
+pandoc: 3.6.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  harf: harf.html
+last_built: 2026-06-29T05:46Z
+urls:
+  reference: https://bips-hb.github.io/harf/reference
+  article: https://bips-hb.github.io/harf/articles
