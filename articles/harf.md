@@ -3,9 +3,9 @@
 ## Introduction
 
 The R package **harf** extends adversarial random forests (ARFs) to
-high-dimensional data. This vignette serves as a user guide to use the
-package effectively. Two key functionalities are provided: `h_arf` to
-train and estimate densities in a high-dimensional adversarial random
+high-dimensional omics data. This vignette serves as a user guide to use
+the package effectively. Two key functionalities are provided: `h_arf`
+to train and estimate densities in a high-dimensional adversarial random
 forest ($`h`$-ARF), and `h_forge` for the synthetic data generating
 process. Unconditional and conditional data generating processes are
 supported. The package is designed to handle high-dimensional omics
@@ -496,14 +496,13 @@ kich_harf <- h_arf(
 #> Iteration: 0, Accuracy: 56.99%
 #> Iteration: 1, Accuracy: 38.04%
 #> Iteration: 0, Accuracy: 46.74%
-#> Iteration: 0, Accuracy: 50.54%
-#> Iteration: 1, Accuracy: 40.86%
-#> Iteration: 0, Accuracy: 44.68%
-#> Iteration: 0, Accuracy: 59.57%
-#> Iteration: 1, Accuracy: 34.41%
-#> Iteration: 0, Accuracy: 53.19%
-#> Iteration: 1, Accuracy: 55.91%
-#> Iteration: 0, Accuracy: 47.83%
+#> Iteration: 0, Accuracy: 47.87%
+#> Iteration: 0, Accuracy: 55.91%
+#> Iteration: 1, Accuracy: 46.24%
+#> Iteration: 0, Accuracy: 48.39%
+#> Iteration: 0, Accuracy: 46.24%
+#> Iteration: 0, Accuracy: 55.43%
+#> Iteration: 1, Accuracy: 44.68%
 ```
 
 ### Generating synthetic data
@@ -593,15 +592,16 @@ performance in case of lack of training datasets.
 - Q. Wang, J Armenia, C. Zhang, A.V. Penson, E. Reznik, L. Zhang, T.
   Minet, A. Ochoa, B.E. Gross, C. A. Iacobuzio-Donahue, D. Betel, B.S.
   Taylor, J. Gao, N. Schultz. Unifying cancer and normal RNA sequencing
-  data from different sources. Scientific Data 5:180061, 2018. Link
-  [here](https://www.nature.com/articles/sdata201861).
+  data from different sources. Scientific Data 5:180061, 2018.
+  [Link](https://www.nature.com/articles/sdata201861).
 
-- Fouodo, C. J. K., et al. (2026). High-dimensional adversarial random
-  forests. Submission. Link [don’t
-  click](https://arxiv.org/abs/2405.12345).
+- Fouodo, C. J. K., Kapar J., Huels A., Liang D., Wright M. N.
+  Adversarial random forests for omics synthesis, 2026 bioRxiv preprint
+  doi: <https://doi.org/10.64898/2026.09.09.750490>,
+  [Link](https://doi.org/10.64898/2026.09.09.750490).
 
 - Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023).
   Adversarial random forests for density estimation and generative
   modeling. In Proceedings of the 26th International Conference on
-  Artificial Intelligence and Statistics. Link
-  [here](https://proceedings.mlr.press/v206/watson23a.html).
+  Artificial Intelligence and Statistics.
+  [Link](https://proceedings.mlr.press/v206/watson23a.html).
