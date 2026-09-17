@@ -2,7 +2,7 @@
 % Please edit documentation in R/h_forge.R
 \name{h_forge}
 \alias{h_forge}
-\title{High-dimensional adversarial random forest (h-ARF).}
+\title{Adversarial random forests for omics synthesis}
 \usage{
 h_forge(
   harf_obj,
@@ -83,8 +83,8 @@ synth_single_cell <- h_forge(
 Proceedings of the International Conference on Machine Learning (PMLR 206).
 \url{https://proceedings.mlr.press/v206/watson23a.html}
 
-\item Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
-Submitted / under review. \if{html}{\out{<Do not click>}}
+\item Fouodo et al. (2026). Adversarial random forests for omics synthesis.
+bioRxiv preprint doi: \url{https://doi.org/10.64898/2026.09.09.750490}
 }
 }
 \seealso{
