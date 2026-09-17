@@ -9,7 +9,7 @@ Status](https://img.shields.io/badge/CRAN-harf-orange)](https://cran.r-project.o
 
 <!-- badges: end -->
 
-## harf: High-dimensional Adversarial Random Forests for Omics Data
+## harf: Adversarial random forests for omics synthesis
 
 ## Introduction
 
@@ -19,13 +19,13 @@ unsupervised RFs, ARFs rely on a recursive adversarial procedure in
 which trees progressively learn the structural properties of the data
 through alternating rounds of data generation and discrimination. The
 unsupervised classification task is achieved by introducing a synthetic
-response variable $y \in \{0,1\}$, where $y = 0$ denotes synthetic
-data and $y = 1$ denotes original data. During the discrimination
+response variable $`y \in \{0,1\}`$, where $`y = 0`$ denotes synthetic
+data and $`y = 1`$ denotes original data. During the discrimination
 phase, the objective is to distinguish original observations from
 synthetic ones. Synthetic data are created during the the adversarial
 game by marginal resampling of the original features in terminal nodes.
-The adversarial process stops when the prediction accuracy for $y$
-falls below a predefined threshold, $0.5$, for example.
+The adversarial process stops when the prediction accuracy for $`y`$
+falls below a predefined threshold, $`0.5`$, for example.
 
 While ARFs have demonstrated strong performance in various
 low-dimensional settings, their behavior in high-dimensional contexts,
@@ -33,7 +33,7 @@ such as omics data, remains non investigated. The key assumption of ARFs
 — that feature distributions are independent within terminal nodes — may
 be violated in high-dimensional settings. For example, if a small subset
 of features is highly predictive of the synthetic response variable
-$y$, the remaining features not used to reach the terminal node may
+$`y`$, the remaining features not used to reach the terminal node may
 still be correlated, not allowing for marginal resampling. A typical
 resulting behaviour of ARF in such a situation is that the algorithm
 terminates without converging.
@@ -52,7 +52,8 @@ other isolated region by synthesized meta-observations. The *h*-ARF
 algorithm offers a flexible framework for unconditional and conditional
 data generation for downstream clustering and prediction analyses. The
 package includes a built-in single-cell RNA-seq datasets and TCGA-KICH
-dataset to illustrate its usage. We refer to the package [vignette](https://bips-hb.github.io/harf/articles/harf.html) for
+dataset to illustrate its usage. We refer to the package
+[vignette](https://bips-hb.github.io/harf/articles/harf.html) for
 detailed examples and explanations.
 
 ## Package installation
@@ -61,18 +62,19 @@ detailed examples and explanations.
 devtools::install_github("bips-hb/harf")
 ```
 
-Visit our vignette
-[here](https://bips-hb.github.io/harf/articles/harf.html) for detailed
-examples and explanations.
+Visit our [vignette](https://bips-hb.github.io/harf/articles/harf.html)
+for detailed examples and explanations.
 
 ## References
 
-- Fouodo, C. J. K., Kapar, J. Huels A., Qin, S. Z. & Wright, M. N.
-  (2026). High-dimensional adversarial random forests. submitted for
-  peer review. Link [don’t click](https://arxiv.org/abs/2405.12345).
+- Fouodo, C. J. K., Kapar, J. Huels A., Liang, D. & Wright, M. N.
+  (2026). Adversarial random forests for omics synthesis. bioRxiv
+  preprint doi: <https://doi.org/10.64898/2026.09.09.750490>.
+  [Link](https://doi.org/10.64898/2026.09.09.750490).
 
 - Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023).
   Adversarial random forests for density estimation and generative
   modeling. In Proceedings of the 26th International Conference on
-  Artificial Intelligence and Statistics. Link
-  [here](https://proceedings.mlr.press/v206/watson23a.html).
+  Artificial Intelligence and Statistics. Proceedings of Machine
+  Learning Research, pages 5357–5375. PMLR, 2023.
+  [Link](https://proceedings.mlr.press/v206/watson23a.html).

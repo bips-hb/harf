@@ -398,8 +398,8 @@ We introduced the R package **harf** to synthesize high-dimensional data. The pa
 
 - Genetic effects on gene expression across human tissues. Nature, 550, 204–213. (2017). Link [here](https://www.nature.com/articles/nature24277).
 
-- Q. Wang, J Armenia, C. Zhang, A.V. Penson, E. Reznik, L. Zhang, T. Minet, A. Ochoa, B.E. Gross, C. A. Iacobuzio-Donahue, D. Betel, B.S. Taylor, J. Gao, N. Schultz. Unifying cancer and normal RNA sequencing data from different sources. Scientific Data 5:180061, 2018. Link [here](https://www.nature.com/articles/sdata201861).
+- Q. Wang, J Armenia, C. Zhang, A.V. Penson, E. Reznik, L. Zhang, T. Minet, A. Ochoa, B.E. Gross, C. A. Iacobuzio-Donahue, D. Betel, B.S. Taylor, J. Gao, N. Schultz. Unifying cancer and normal RNA sequencing data from different sources. Scientific Data 5:180061, 2018. [Link](https://www.nature.com/articles/sdata201861).
 
-- Fouodo, C. J. K., et al. (2026). High-dimensional adversarial random forests. Submission. Link [don't click](https://arxiv.org/abs/2405.12345).
+- Fouodo, C. J. K., Kapar J., Huels A., Liang D., Wright M. N. Adversarial random forests for omics synthesis, 2026 bioRxiv preprint doi: https://doi.org/10.64898/2026.09.09.750490, [Link](https://doi.org/10.64898/2026.09.09.750490).
 
-- Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023). Adversarial random forests for density estimation and generative modeling. In Proceedings of the 26th International Conference on Artificial Intelligence and Statistics. Link [here](https://proceedings.mlr.press/v206/watson23a.html).
+- Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023). Adversarial random forests for density estimation and generative modeling. In Proceedings of the 26th International Conference on Artificial Intelligence and Statistics.  [Link](https://proceedings.mlr.press/v206/watson23a.html).

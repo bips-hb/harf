@@ -1,4 +1,4 @@
-#' High-dimensional adversarial random forest (h-ARF).
+#' Adversarial random forests for omics synthesis
 #'
 #' This function extends the adversarial random forest (ARF) algorithm to high-dimensional settings. It partitions high-dimensional data into isolated regions and fits ARF models within each region and on a latent space representing region joint distribution to capture within and between region feature dependencies.
 #'
@@ -38,8 +38,8 @@
 #'   Proceedings of the International Conference on Machine Learning (PMLR 206).
 #'   <https://proceedings.mlr.press/v206/watson23a.html>
 #'
-#'   \item Fouodo et al. (2026). High-Dimensional Adversarial Random Forests.
-#'   Submitted / under review. <Do not click>
+#'   \item Fouodo et al. (2026). Adversarial random forests for omics synthesis.
+#'   bioRxiv preprint doi: <https://doi.org/10.64898/2026.09.09.750490>
 #' }
 #' @seealso [h_forge], [arf::adversarial_rf], [arf::forde]
 #' @examples
