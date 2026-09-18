@@ -69,12 +69,12 @@ for detailed examples and explanations.
 
 - Fouodo, C. J. K., Kapar, J. Huels A., Liang, D. & Wright, M. N.
   (2026). Adversarial random forests for omics synthesis. bioRxiv
-  preprint doi: <https://doi.org/10.64898/2026.09.09.750490>.
-  [Link](https://doi.org/10.64898/2026.09.09.750490).
+  preprint
+  [doi:10.64898/2026.09.09.750490](https://doi.org/10.64898/2026.09.09.750490).
 
 - Watson, D. S., Blesch, K., Kapar, J. & Wright, M. N. (2023).
   Adversarial random forests for density estimation and generative
   modeling. In Proceedings of the 26th International Conference on
-  Artificial Intelligence and Statistics. Proceedings of Machine
-  Learning Research, pages 5357–5375. PMLR, 2023.
-  [Link](https://proceedings.mlr.press/v206/watson23a.html).
+  Artificial Intelligence and Statistics. [Proceedings of Machine
+  Learning Research, pages 5357–5375. PMLR,
+  2023.](https://proceedings.mlr.press/v206/watson23a.html).

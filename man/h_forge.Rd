@@ -84,7 +84,7 @@ Proceedings of the International Conference on Machine Learning (PMLR 206).
 \url{https://proceedings.mlr.press/v206/watson23a.html}
 
 \item Fouodo et al. (2026). Adversarial random forests for omics synthesis.
-bioRxiv preprint doi: \url{https://doi.org/10.64898/2026.09.09.750490}
+bioRxiv preprint \doi{10.64898/2026.09.09.750490}
 }
 }
 \seealso{
