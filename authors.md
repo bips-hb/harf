@@ -13,12 +13,12 @@
 Source:
 [`DESCRIPTION`](https://github.com/bips-hb/harf/blob/main/DESCRIPTION)
 
-Fouodo CJK, Kapar J, Wright MN (2026). *harf: Adversarial random forests
-for omics synthesis*. R package version 0.1.0,
+Fouodo CJK, Kapar J, Wright MN (2026). *harf: Adversarial Random Forests
+for Omics Synthesis*. R package version 0.1.0,
 <https://bips-hb.github.io/harf/>.
 
     @Manual{,
-      title = {harf: Adversarial random forests for omics synthesis},
+      title = {harf: Adversarial Random Forests for Omics Synthesis},
       author = {Cesaire J. K. Fouodo and Jan Kapar and Marvin N. Wright},
       year = {2026},
       note = {R package version 0.1.0},

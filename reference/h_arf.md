@@ -160,7 +160,8 @@ clustering information.
   <https://proceedings.mlr.press/v206/watson23a.html>
 
 - Fouodo et al. (2026). Adversarial random forests for omics synthesis.
-  bioRxiv preprint doi: <https://doi.org/10.64898/2026.09.09.750490>
+  bioRxiv preprint
+  [doi:10.64898/2026.09.09.750490](https://doi.org/10.64898/2026.09.09.750490)
 
 ## See also
 
