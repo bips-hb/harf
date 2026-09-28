@@ -19,13 +19,13 @@ unsupervised RFs, ARFs rely on a recursive adversarial procedure in
 which trees progressively learn the structural properties of the data
 through alternating rounds of data generation and discrimination. The
 unsupervised classification task is achieved by introducing a synthetic
-response variable $`y \in \{0,1\}`$, where $`y = 0`$ denotes synthetic
-data and $`y = 1`$ denotes original data. During the discrimination
+response variable $y \in \{0,1\}$, where $y = 0$ denotes synthetic
+data and $y = 1$ denotes original data. During the discrimination
 phase, the objective is to distinguish original observations from
 synthetic ones. Synthetic data are created during the the adversarial
 game by marginal resampling of the original features in terminal nodes.
-The adversarial process stops when the prediction accuracy for $`y`$
-falls below a predefined threshold, $`0.5`$, for example.
+The adversarial process stops when the prediction accuracy for $y$
+falls below a predefined threshold, $0.5$, for example.
 
 While ARFs have demonstrated strong performance in various
 low-dimensional settings, their behavior in high-dimensional contexts,
@@ -33,7 +33,7 @@ such as omics data, remains non investigated. The key assumption of ARFs
 — that feature distributions are independent within terminal nodes — may
 be violated in high-dimensional settings. For example, if a small subset
 of features is highly predictive of the synthetic response variable
-$`y`$, the remaining features not used to reach the terminal node may
+$y$, the remaining features not used to reach the terminal node may
 still be correlated, not allowing for marginal resampling. A typical
 resulting behaviour of ARF in such a situation is that the algorithm
 terminates without converging.
