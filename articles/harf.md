@@ -122,8 +122,8 @@ harf_model <- h_arf(
  chunk_size = chunk_size,
  verbose = TRUE
 )
-#> Iteration: 0, Accuracy: 77.86%
-#> Iteration: 1, Accuracy: 45.87%
+#> Iteration: 0, Accuracy: 81.05%
+#> Iteration: 1, Accuracy: 40.31%
 #> Iteration: 0, Accuracy: 86.56%
 #> Iteration: 1, Accuracy: 47.4%
 #> Iteration: 0, Accuracy: 85.36%
@@ -177,7 +177,7 @@ str(harf_model,max.level = 1)
 #>  $ cli_lab_features : chr "cell_type"
 #>  $ omx_constant_data: NULL
 #>  $ feature_ordering : chr [1:81] "cell_type" "V1" "V2" "V3" ...
-#>  $ accuracy         : Named num [1:19] 0.459 0.474 0.483 0.474 0.48 ...
+#>  $ accuracy         : Named num [1:19] 0.403 0.474 0.483 0.474 0.48 ...
 #>   ..- attr(*, "names")= chr [1:19] "meta_model" "cluster_2" "cluster_3" "cluster_6" ...
 #>  - attr(*, "class")= chr "harf"
 ```
